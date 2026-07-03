@@ -361,7 +361,7 @@ function setSelection(bounds) {
   selectedPolygonLatLngs = null;
   if (selectionLayer && map.hasLayer(selectionLayer)) map.removeLayer(selectionLayer);
   selectionLayer = L.rectangle(bounds, { color: '#e53935', weight: 3, dashArray: '6,4', fillOpacity: 0.06 }).addTo(map);
-  map.fitBounds(bounds.pad(0.15));
+  map.fitBounds(bounds.pad(0.06), { maxZoom: 19 });
   document.getElementById('fetchBtn').disabled = false;
   document.getElementById('topbar-status').textContent = 'تم تحديد المربع — اضغط استخراج الشوارع والمحلات';
   hideResults();
@@ -390,7 +390,7 @@ function setSelectionPolygon(rawLatLngs) {
   if (selectionLayer && map.hasLayer(selectionLayer)) map.removeLayer(selectionLayer);
   selectionLayer = L.polygon(selectedPolygonLatLngs, { color:'#e53935', weight:3, dashArray:'6,4', fillOpacity:0.08 }).addTo(map);
 
-  map.fitBounds(bounds.pad(0.15));
+  map.fitBounds(bounds.pad(0.06), { maxZoom: 19 });
   document.getElementById('fetchBtn').disabled = false;
   document.getElementById('topbar-status').textContent = 'تم تحديد المنطقة بالرسم الحر — اضغط استخراج الشوارع والمحلات';
   hideResults();
@@ -562,13 +562,17 @@ function updateCenterMarker() {
     : '';
   const icon = L.divIcon({
     className: '',
-    html: `<div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-92%);">
+    html: `<div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-92%);cursor:pointer;">
       <div style="font-size:32px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.65));">📍</div>
       ${nameHtml}
+      <div style="margin-top:3px;background:rgba(15,34,51,0.92);color:#7ea8ff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:14px;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,0.4);border:1px solid #7ea8ff;">🗺️ افتح في خرائط جوجل</div>
     </div>`,
     iconSize: null
   });
-  researcherMarker = L.marker(center, { icon, interactive: false }).addTo(map);
+  researcherMarker = L.marker(center, { icon, interactive: true }).addTo(map);
+  researcherMarker.on('click', () => {
+    window.open(`https://www.google.com/maps?q=${center.lat},${center.lng}`, '_blank');
+  });
 }
 
 function setPaperSize(size) {
@@ -655,7 +659,7 @@ async function loadDistrictStreetNames(forceRefresh) {
     const bbox = bboxStr(DISTRICT_BOUNDS);
     // نطلب مركز كل شارع فقط (وليس كامل هندسته) لتقليل حجم البيانات وتسريع التحميل بشكل كبير
     const q = `[out:json][timeout:25];
-      way["highway"~"^(primary|secondary|tertiary|unclassified|residential|living_street|pedestrian)$"]["name"](${bbox});
+      way["highway"~"^(primary|secondary|tertiary|unclassified|residential|living_street|pedestrian|service)$"]["name"](${bbox});
       out center tags;`;
     const data = await overpassQuery(q, 22000);
     const freshMap = new Map();
@@ -833,7 +837,7 @@ const CATEGORY_ICONS = {
   'وجبات سريعة':'🍔','حضانة':'🧸','شرطة':'🚓','بريد':'✉️',
   'جامع':'🕌','كنيسة':'⛪','دار عبادة':'🛐','منشأة':'📍'
 };
-const LANDMARK_CATEGORIES = new Set(['جامع','كنيسة','دار عبادة','مستشفى','عيادة','مدرسة','حضانة','بنك','شرطة','بريد','سوق']);
+const LANDMARK_CATEGORIES = new Set(['جامع','كنيسة','مدرسة','سوبر ماركت']);
 function categoryDotColor(category) {
   if (['جامع','كنيسة','دار عبادة'].includes(category)) return '#c9a84c';
   if (['مستشفى','عيادة','صيدلية'].includes(category)) return '#e53935';
@@ -872,17 +876,17 @@ async function overpassQueryOnce(q, timeoutMs) {
 }
 
 async function overpassQuery(q, timeoutMs) {
-  try {
-    return await overpassQueryOnce(q, timeoutMs);
-  } catch (err) {
-    // محاولة ثانية تلقائية بعد مهلة قصيرة، لتفادي الأخطاء العابرة المؤقتة في خوادم Overpass
-    await new Promise(r => setTimeout(r, 1500));
+  const delays = [1200, 2500]; // محاولتان إضافيتان بعد الأولى، بفاصل زمني متزايد
+  let lastErr;
+  for (let i = 0; i <= delays.length; i++) {
     try {
       return await overpassQueryOnce(q, timeoutMs);
-    } catch (err2) {
-      throw new Error('تعذر الاتصال بخدمة استخراج البيانات — تحقق من الاتصال بالإنترنت وحاول مرة أخرى');
+    } catch (err) {
+      lastErr = err;
+      if (i < delays.length) await new Promise(r => setTimeout(r, delays[i]));
     }
   }
+  throw new Error('تعذر الاتصال بخدمة استخراج البيانات بعد عدة محاولات — قد تكون خوادم الخرائط مزدحمة حالياً، حاول مرة أخرى بعد قليل');
 }
 
 async function fetchAreaData() {
@@ -1024,14 +1028,32 @@ function estimateUnitsForBuilding(tags) {
 
 function computeDensityEstimate(buildingsData, polygonLatLngs, bounds) {
   const elements = buildingsData?.elements || [];
-  let buildingCount = 0, totalUnits = 0, usedDefaultFloors = 0;
-  elements.forEach(el => {
-    const tags = el.tags || {};
-    if (!RESIDENTIAL_BUILDING_TYPES.has(tags.building)) return;
-    buildingCount++;
-    if (!tags['building:levels'] && !tags['building:flats']) usedDefaultFloors++;
-    totalUnits += estimateUnitsForBuilding(tags);
-  });
+  let buildingCount = 0, totalUnits = 0, usedDefaultFloors = 0, usedFallbackYes = false;
+
+  const countPass = (predicate) => {
+    let count = 0, units = 0, defaults = 0;
+    elements.forEach(el => {
+      const tags = el.tags || {};
+      if (!predicate(tags)) return;
+      count++;
+      if (!tags['building:levels'] && !tags['building:flats']) defaults++;
+      units += estimateUnitsForBuilding(tags);
+    });
+    return { count, units, defaults };
+  };
+
+  // المحاولة الأولى: مبانٍ مصنّفة صراحة كسكنية
+  let pass = countPass(tags => RESIDENTIAL_BUILDING_TYPES.has(tags.building));
+  buildingCount = pass.count; totalUnits = pass.units; usedDefaultFloors = pass.defaults;
+
+  // إذا لم توجد مبانٍ مصنّفة (شائع في بيانات OSM لبعض المناطق)، نحسب تقديراً أوسع من كل مبنى غير مصنّف (building=yes)
+  // باستثناء ما هو معروف أنه محل/منشأة تجارية بحتة، كتقدير احتياطي أقل دقة
+  if (buildingCount === 0) {
+    pass = countPass(tags => tags.building === 'yes' && !tags.shop && tags.amenity !== 'place_of_worship');
+    buildingCount = pass.count; totalUnits = pass.units; usedDefaultFloors = pass.defaults;
+    usedFallbackYes = buildingCount > 0;
+  }
+
   const population = totalUnits * ASSUMED_HOUSEHOLD_SIZE;
   const areaKm2 = polygonLatLngs ? polygonAreaKm2(polygonLatLngs) : boundsAreaKm2(bounds);
   const density = areaKm2 > 0 ? population / areaKm2 : 0;
@@ -1039,19 +1061,28 @@ function computeDensityEstimate(buildingsData, polygonLatLngs, bounds) {
     buildingCount, totalUnits, population,
     areaKm2: Math.round(areaKm2 * 1000) / 1000,
     density: Math.round(density),
-    usedDefaultFloors
+    usedDefaultFloors, usedFallbackYes
   };
 }
 
 // يضع ملصق اسم واحد لكل شارع فريد عند أطول قطعة منه، ليظهر اسم الشارع مباشرة على الخريطة عند التكبير
+const MAX_STREET_LABELS_ON_MAP = 10; // تفادي تكدّس الأسماء فوق بعضها عند وجود عدد كبير من الشوارع
+
 function addStreetLabels(streetNamesMap) {
+  // نحسب أطول قطعة لكل شارع، ثم نعرض الاسم فقط لأطول عدد محدود من الشوارع (الأكثر أهمية غالباً)
+  const withLength = [];
   streetNamesMap.forEach((segments, name) => {
     let longest = segments[0];
     segments.forEach(seg => { if (seg.length > longest.length) longest = seg; });
     if (!longest || !longest.length) return;
-    const mid = longest[Math.floor(longest.length / 2)];
-    drawStreetLabel(name, mid);
+    let lenMeters = 0;
+    for (let i = 1; i < longest.length; i++) {
+      lenMeters += map.distance(longest[i - 1], longest[i]);
+    }
+    withLength.push({ name, mid: longest[Math.floor(longest.length / 2)], lenMeters });
   });
+  withLength.sort((a, b) => b.lenMeters - a.lenMeters);
+  withLength.slice(0, MAX_STREET_LABELS_ON_MAP).forEach(s => drawStreetLabel(s.name, s.mid));
 }
 function drawStreetLabel(name, midpoint) {
   const icon = L.divIcon({
@@ -1117,11 +1148,12 @@ function renderResults() {
     } else {
       const d = lastDensity;
       dEl.innerHTML = `
-        🏢 عدد المباني السكنية المكتشفة: <strong>${d.buildingCount}</strong><br>
+        🏢 عدد المباني ${d.usedFallbackYes ? '(غير مصنّفة تفصيلاً)' : 'السكنية'} المكتشفة: <strong>${d.buildingCount}</strong><br>
         🏠 إجمالي الوحدات السكنية التقديرية: <strong>${d.totalUnits.toLocaleString('ar-EG')}</strong><br>
         👥 عدد السكان التقديري: <strong>${d.population.toLocaleString('ar-EG')}</strong> نسمة<br>
         📐 مساحة المنطقة: <strong>${d.areaKm2}</strong> كم²<br>
         📊 الكثافة السكانية التقديرية: <strong>${d.density.toLocaleString('ar-EG')}</strong> نسمة/كم²
+        ${d.usedFallbackYes ? '<br><span style="color:#e0a030">⚠️ لم توجد مبانٍ مصنّفة كسكنية بدقة في بيانات الخريطة، فتم الاحتساب من كل المباني الموجودة كتقدير أوسع.</span>' : ''}
       `;
     }
   }
@@ -1232,7 +1264,7 @@ function buildReportHTML() {
       <tr><td>مساحة المنطقة</td><td>${d.areaKm2} كم²</td></tr>
       <tr><td>الكثافة السكانية التقديرية</td><td>${d.density.toLocaleString('ar-EG')} نسمة/كم²</td></tr>
     </tbody></table>
-    <p style="color:#888;font-size:11px;margin-top:6px">⚠️ تقدير تقريبي بناءً على بيانات OpenStreetMap وافتراضات متوسطة (${ASSUMED_UNITS_PER_FLOOR} وحدة/دور، ${ASSUMED_HOUSEHOLD_SIZE} أفراد/أسرة تقريباً)، وليس إحصاءً رسمياً.</p>`;
+    <p style="color:#888;font-size:11px;margin-top:6px">⚠️ تقدير تقريبي بناءً على بيانات OpenStreetMap وافتراضات متوسطة (${ASSUMED_UNITS_PER_FLOOR} وحدة/دور، ${ASSUMED_HOUSEHOLD_SIZE} أفراد/أسرة تقريباً)، وليس إحصاءً رسمياً.${d.usedFallbackYes ? ' لم توجد مبانٍ مصنّفة كسكنية بدقة في بيانات الخريطة، فتم الاحتساب من كل المباني الموجودة كتقدير أوسع.' : ''}</p>`;
   }
 
   el.innerHTML = `
