@@ -271,7 +271,7 @@
     <div class="legend">
       <div class="legend-item"><span class="legend-swatch" style="background:#e53935"></span> الشوارع الرئيسية</div>
       <div class="legend-item"><span class="legend-swatch" style="background:#1e88e5"></span> محلات ومنشآت</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#c9a84c;border:2px dashed #c9a84c"></span> حدود المربع</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#e53935;border:2px dashed #e53935"></span> حدود منطقة البحث</div>
     </div>
 
     <div class="result-group">
@@ -325,7 +325,7 @@ const map = L.map('map', {
   minZoom: 12
 }).fitBounds(DISTRICT_BOUNDS);
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png', {
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; OpenStreetMap &copy; CARTO',
   maxZoom: 20,
   crossOrigin: true
@@ -360,12 +360,12 @@ function setSelection(bounds) {
   selectedBounds = bounds;
   selectedPolygonLatLngs = null;
   if (selectionLayer && map.hasLayer(selectionLayer)) map.removeLayer(selectionLayer);
-  selectionLayer = L.rectangle(bounds, { color: '#c9a84c', weight: 3, dashArray: '6,4', fillOpacity: 0.08 }).addTo(map);
+  selectionLayer = L.rectangle(bounds, { color: '#e53935', weight: 3, dashArray: '6,4', fillOpacity: 0.06 }).addTo(map);
   map.fitBounds(bounds.pad(0.15));
   document.getElementById('fetchBtn').disabled = false;
   document.getElementById('topbar-status').textContent = 'تم تحديد المربع — اضغط استخراج الشوارع والمحلات';
   hideResults();
-  updateResearcherLabel();
+  updateCenterMarker();
 }
 
 function simplifyPoints(pts, maxCount) {
@@ -388,13 +388,13 @@ function setSelectionPolygon(rawLatLngs) {
   selectedBounds = bounds;
 
   if (selectionLayer && map.hasLayer(selectionLayer)) map.removeLayer(selectionLayer);
-  selectionLayer = L.polygon(selectedPolygonLatLngs, { color:'#c9a84c', weight:3, dashArray:'6,4', fillOpacity:0.1 }).addTo(map);
+  selectionLayer = L.polygon(selectedPolygonLatLngs, { color:'#e53935', weight:3, dashArray:'6,4', fillOpacity:0.08 }).addTo(map);
 
   map.fitBounds(bounds.pad(0.15));
   document.getElementById('fetchBtn').disabled = false;
   document.getElementById('topbar-status').textContent = 'تم تحديد المنطقة بالرسم الحر — اضغط استخراج الشوارع والمحلات';
   hideResults();
-  updateResearcherLabel();
+  updateCenterMarker();
 }
 
 // ===================== أداة رسم موحّدة (مربع + رسم حر) بدون أي مكتبات خارجية =====================
@@ -469,10 +469,10 @@ function handleDrawStart(latlng) {
   isDrawingActive = true;
   if (drawTool === 'rect') {
     rectStartLatLng = latlng;
-    tempRectLayer = L.rectangle(L.latLngBounds(latlng, latlng), { color:'#c9a84c', weight:3, dashArray:'6,4', fillOpacity:0.08 }).addTo(map);
+    tempRectLayer = L.rectangle(L.latLngBounds(latlng, latlng), { color:'#e53935', weight:3, dashArray:'6,4', fillOpacity:0.06 }).addTo(map);
   } else if (drawTool === 'freehand') {
     freehandLatLngs = [latlng];
-    freehandLine = L.polyline(freehandLatLngs, { color:'#c9a84c', weight:4 }).addTo(map);
+    freehandLine = L.polyline(freehandLatLngs, { color:'#e53935', weight:4 }).addTo(map);
   }
 }
 function handleDrawMove(latlng) {
@@ -548,20 +548,27 @@ window.addEventListener('mouseup', () => { if (drawTool) handleDrawEnd(); });
 // ===================== ملصق اسم الباحث على المربع =====================
 function onResearcherNameChange() {
   researcherName = document.getElementById('researcherName').value.trim();
-  updateResearcherLabel();
+  updateCenterMarker();
   saveState();
 }
 
-function updateResearcherLabel() {
+// نقطة مرجعية واحدة في مركز منطقة البحث (تمثل موقع الوصول للحالة)، مع اسم الباحث ملصقاً بجانبها
+function updateCenterMarker() {
   if (researcherMarker) { map.removeLayer(researcherMarker); researcherMarker = null; }
-  if (!researcherName || !selectedBounds) return;
-  const pos = [selectedBounds.getNorth(), (selectedBounds.getWest() + selectedBounds.getEast()) / 2];
+  if (!selectedBounds) return;
+  const center = selectedBounds.getCenter();
+  const nameHtml = researcherName
+    ? `<div style="margin-top:3px;background:linear-gradient(135deg,#c9a84c,#a07830);color:#fff;font-weight:800;font-size:11px;padding:4px 11px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.45);border:1.5px solid #fff;">🖊️ ${escHtml(researcherName)}</div>`
+    : '';
   const icon = L.divIcon({
     className: '',
-    html: `<div style="background:linear-gradient(135deg,#c9a84c,#a07830);color:#fff;font-weight:800;font-size:12px;padding:5px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.45);border:1.5px solid #fff;transform:translate(-50%,-110%);">🖊️ الباحث: ${escHtml(researcherName)}</div>`,
+    html: `<div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-92%);">
+      <div style="font-size:32px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.65));">📍</div>
+      ${nameHtml}
+    </div>`,
     iconSize: null
   });
-  researcherMarker = L.marker(pos, { icon, interactive: false }).addTo(map);
+  researcherMarker = L.marker(center, { icon, interactive: false }).addTo(map);
 }
 
 function setPaperSize(size) {
@@ -846,7 +853,7 @@ const OVERPASS_ENDPOINTS = [
   'https://overpass.openstreetmap.ru/api/interpreter'
 ];
 
-async function overpassQuery(q, timeoutMs) {
+async function overpassQueryOnce(q, timeoutMs) {
   const body = 'data=' + encodeURIComponent(q);
   const timeout = timeoutMs || 20000;
   const attempts = OVERPASS_ENDPOINTS.map(url => {
@@ -860,11 +867,21 @@ async function overpassQuery(q, timeoutMs) {
       })
       .catch(err => { clearTimeout(timer); throw err; });
   });
+  // نرسل الطلب لعدة خوادم Overpass في آن واحد ونستخدم أسرع رد صحيح، مع مهلة زمنية لكل خادم حتى لا يتجمد التحميل بلا نتيجة
+  return Promise.any(attempts);
+}
+
+async function overpassQuery(q, timeoutMs) {
   try {
-    // نرسل الطلب لعدة خوادم Overpass في آن واحد ونستخدم أسرع رد صحيح، مع مهلة زمنية لكل خادم حتى لا يتجمد التحميل بلا نتيجة
-    return await Promise.any(attempts);
+    return await overpassQueryOnce(q, timeoutMs);
   } catch (err) {
-    throw new Error('تعذر الاتصال بخدمة استخراج البيانات — تحقق من الاتصال بالإنترنت وحاول مرة أخرى');
+    // محاولة ثانية تلقائية بعد مهلة قصيرة، لتفادي الأخطاء العابرة المؤقتة في خوادم Overpass
+    await new Promise(r => setTimeout(r, 1500));
+    try {
+      return await overpassQueryOnce(q, timeoutMs);
+    } catch (err2) {
+      throw new Error('تعذر الاتصال بخدمة استخراج البيانات — تحقق من الاتصال بالإنترنت وحاول مرة أخرى');
+    }
   }
 }
 
@@ -892,9 +909,21 @@ async function fetchAreaData() {
     out tags center;`;
 
   try {
-    const [streetsData, shopsData, buildingsData] = await Promise.all([
+    const results = await Promise.allSettled([
       overpassQuery(streetsQ), overpassQuery(shopsQ), overpassQuery(buildingsQ)
     ]);
+    const [streetsRes, shopsRes, buildingsRes] = results;
+    if (streetsRes.status === 'rejected' && shopsRes.status === 'rejected') {
+      // فشل الاثنان الأساسيان معاً فقط هو ما يعتبر فشلاً كاملاً؛ أما فشل استعلام المباني وحده فلا يوقف باقي النتائج
+      throw streetsRes.reason || shopsRes.reason || new Error('تعذر الاتصال بالخدمة');
+    }
+    const streetsData = streetsRes.status === 'fulfilled' ? streetsRes.value : { elements: [] };
+    const shopsData = shopsRes.status === 'fulfilled' ? shopsRes.value : { elements: [] };
+    const buildingsData = buildingsRes.status === 'fulfilled' ? buildingsRes.value : { elements: [] };
+    const partialFailNote = [];
+    if (streetsRes.status === 'rejected') partialFailNote.push('الشوارع');
+    if (shopsRes.status === 'rejected') partialFailNote.push('المحلات');
+    if (buildingsRes.status === 'rejected') partialFailNote.push('تقدير الكثافة السكانية');
 
     // معالجة الشوارع
     const streetNames = new Map();
@@ -939,7 +968,8 @@ async function fetchAreaData() {
     lastDensity = computeDensityEstimate(buildingsData, selectedPolygonLatLngs || null, selectedBounds);
 
     renderResults();
-    setStatus('fetchStatus', `✅ تم العثور على ${lastStreets.length} شارع و ${lastShops.length} محل/منشأة داخل المربع.`, 'ok');
+    const partialNote = partialFailNote.length ? ` (تعذر تحميل: ${partialFailNote.join('، ')} — يمكنك الضغط على استخراج مرة أخرى)` : '';
+    setStatus('fetchStatus', `✅ تم العثور على ${lastStreets.length} شارع و ${lastShops.length} محل/منشأة داخل المربع.${partialNote}`, partialFailNote.length ? 'err' : 'ok');
     document.getElementById('topbar-status').textContent = `${lastStreets.length} شارع • ${lastShops.length} محل ومنشأة`;
     saveState();
   } catch (err) {
@@ -1307,7 +1337,7 @@ function restoreState() {
     renderResults();
     document.getElementById('topbar-status').textContent = `${lastStreets.length} شارع • ${lastShops.length} محل ومنشأة (تم الاسترجاع)`;
   }
-  updateResearcherLabel();
+  updateCenterMarker();
 }
 
 function setPaperSizeSilent(size) {
