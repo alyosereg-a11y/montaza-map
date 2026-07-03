@@ -1010,11 +1010,11 @@ async function fetchAreaData() {
         category = AMENITY_LABELS[tags.amenity] || tags.amenity;
       }
       if (!name && !category) return;
-      const shop = { name: name || 'بدون اسم', category: category || 'منشأة', lat, lon };
-      shops.push(shop);
-      drawShopMarker(shop);
+      shops.push({ name: name || 'بدون اسم', category: category || 'منشأة', lat, lon });
     });
     lastShops = shops;
+    drawAllShopMarkers(shops); // يرسم كل المحلات، مع تحديد عدد ملصقات المعالم البارزة الظاهرة لتفادي الازدحام
+
 
     // تقدير الكثافة السكانية من عدد المباني السكنية وارتفاعها (تقدير تقريبي وليس إحصاءً رسمياً)
     lastDensity = computeDensityEstimate(buildingsData, selectedPolygonLatLngs || null, selectedBounds);
@@ -1142,13 +1142,34 @@ function drawStreetLabel(name, midpoint) {
 }
 
 // يعرض كل محل/معلم كأيقونة + اسم ظاهرين مباشرة على الخريطة (بدون الحاجة للضغط)، بلون مميز للمعالم البارزة
-function drawShopMarker(shop) {
+const MAX_LANDMARK_LABELS_ON_MAP = 6;   // إجمالي أقصى عدد ملصقات معالم ظاهرة على الخريطة
+const MAX_LABELS_PER_CATEGORY = 2;      // حد أقصى لكل نوع (جامع/كنيسة/مدرسة/سوبر ماركت) لضمان تنوّع لا تكرار فئة واحدة
+
+// يرسم كل المحلات، لكنه يمنح ملصق اسم دائم فقط لعدد محدود من أهم المعالم (بحد أقصى لكل فئة)؛
+// الباقي (وكل المحلات العادية) تظهر كنقطة صغيرة يظهر اسمها بالضغط عليها فقط، لتفادي ازدحام الخريطة والطباعة
+function drawAllShopMarkers(shops) {
+  const categoryCount = {};
+  let landmarkLabelTotal = 0;
+  shops.forEach(shop => {
+    let showLabel = false;
+    if (LANDMARK_CATEGORIES.has(shop.category)) {
+      const catCount = categoryCount[shop.category] || 0;
+      if (landmarkLabelTotal < MAX_LANDMARK_LABELS_ON_MAP && catCount < MAX_LABELS_PER_CATEGORY) {
+        showLabel = true;
+        categoryCount[shop.category] = catCount + 1;
+        landmarkLabelTotal++;
+      }
+    }
+    drawShopMarker(shop, showLabel);
+  });
+}
+
+function drawShopMarker(shop, showLabel) {
   const icon = CATEGORY_ICONS[shop.category] || '📍';
   const dotColor = categoryDotColor(shop.category);
-  const isLandmark = LANDMARK_CATEGORIES.has(shop.category);
 
-  if (isLandmark) {
-    // المعالم البارزة (جوامع، كنائس، مستشفيات، مدارس...) تظهر باسمها دائماً لتقليل الحاجة للضغط عليها
+  if (showLabel) {
+    // المعالم البارزة المختارة (بحد أقصى لكل فئة) تظهر باسمها دائماً لتقليل الحاجة للضغط عليها
     const divIcon = L.divIcon({
       className: '',
       html: `<div style="position:relative;display:flex;align-items:center;gap:4px;transform:translate(-6px,-6px);">
@@ -1161,7 +1182,7 @@ function drawShopMarker(shop) {
       .bindPopup(`<b>${escHtml(shop.name)}</b><br>${escHtml(shop.category)}`)
       .addTo(shopsLayerGroup);
   } else {
-    // المحلات العادية: نقطة صغيرة فقط لتقليل الازدحام البصري، والاسم يظهر بالضغط عليها
+    // كل الباقي: نقطة صغيرة فقط لتقليل الازدحام البصري، والاسم يظهر بالضغط عليها
     L.circleMarker([shop.lat, shop.lon], { radius: 5, color: dotColor, fillColor: dotColor, fillOpacity: 0.9, weight: 1.5 })
       .bindPopup(`<b>${icon} ${escHtml(shop.name)}</b><br>${escHtml(shop.category)}`)
       .addTo(shopsLayerGroup);
@@ -1409,7 +1430,7 @@ function restoreState() {
   if (state.lastDensity) lastDensity = state.lastDensity;
   if (state.lastShops && state.lastShops.length) {
     lastShops = state.lastShops;
-    lastShops.forEach(drawShopMarker);
+    drawAllShopMarkers(lastShops);
   }
   if (state.lastStreetSegments && state.lastStreetSegments.length) {
     lastStreetSegments = state.lastStreetSegments;
