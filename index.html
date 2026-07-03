@@ -1066,7 +1066,7 @@ function computeDensityEstimate(buildingsData, polygonLatLngs, bounds) {
 }
 
 // يضع ملصق اسم واحد لكل شارع فريد عند أطول قطعة منه، ليظهر اسم الشارع مباشرة على الخريطة عند التكبير
-const MAX_STREET_LABELS_ON_MAP = 10; // تفادي تكدّس الأسماء فوق بعضها عند وجود عدد كبير من الشوارع
+const MAX_STREET_LABELS_ON_MAP = 6; // تفادي تكدّس الأسماء فوق بعضها عند وجود عدد كبير من الشوارع
 
 function addStreetLabels(streetNamesMap) {
   // نحسب أطول قطعة لكل شارع، ثم نعرض الاسم فقط لأطول عدد محدود من الشوارع (الأكثر أهمية غالباً)
@@ -1176,8 +1176,14 @@ async function exportPDF() {
 
     // --- صفحة 1: الخريطة المكبرة ---
     map.closePopup();
+    // قبل الالتقاط: نحفظ العرض الحالي، ثم نقرّب الخريطة بإحكام على منطقة البحث فقط
+    // لضمان خريطة واضحة ومكبرة تملأ صفحة الطباعة بالكامل، ثم نعيد العرض كما كان بعد الالتقاط
+    const printOriginalCenter = map.getCenter();
+    const printOriginalZoom = map.getZoom();
+    const printBounds = selectedPolygonLatLngs ? L.polygon(selectedPolygonLatLngs).getBounds() : selectedBounds;
+    map.fitBounds(printBounds.pad(0.04), { maxZoom: 20, animate: false });
     map.invalidateSize();
-    await new Promise(r => setTimeout(r, 400)); // انتظار تحميل البلاطات
+    await new Promise(r => setTimeout(r, 500)); // انتظار تحميل بلاطات الزووم الجديد
 
     // شريط عنوان مؤقت يُضاف داخل الخريطة قبل الالتقاط لضمان ظهور النص العربي بشكل صحيح
     // (النص العربي عبر pdf.text() في jsPDF لا يُعرض بشكل سليم، لذلك نلتقطه كصورة HTML بدلاً من ذلك)
@@ -1193,6 +1199,8 @@ async function exportPDF() {
 
     const mapCanvas = await html2canvas(mapDiv, { useCORS: true, scale: 2, backgroundColor: '#ffffff' });
     mapDiv.removeChild(titleBar);
+    // إعادة الخريطة إلى العرض الذي كان عليه المستخدم قبل التصدير
+    map.setView(printOriginalCenter, printOriginalZoom, { animate: false });
 
     const margin = 24;
     const availW = pageW - margin*2, availH = pageH - margin*2;
