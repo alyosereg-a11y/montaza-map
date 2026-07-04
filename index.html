@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>خريطة المربع السكني - حي المنتزة أول - الإسكندرية</title>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<title>دليل الشوارع - محافظة الإسكندرية</title>
 
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -62,36 +60,9 @@
     padding: 12px 13px; font-size: 14px; font-family: inherit; outline: none;
     text-align: right; -webkit-appearance: none; appearance: none;
   }
-  select { background-image: none; }
-  select:disabled { opacity: .5; }
-  select option { background: #0f2233; color: #e0eef5; }
-  select optgroup { background: #0f2233; color: #c9a84c; font-weight: 800; }
-
-  /* قائمة بحث الشوارع (كتابة أحرف افتتاحية للتصفية) */
-  .street-picker { position: relative; }
-  .street-suggestions {
-    position: absolute; top: calc(100% + 4px); right: 0; left: 0; z-index: 600;
-    background: #0f2233; border: 1.5px solid #c9a84c; border-radius: 10px;
-    max-height: 220px; overflow-y: auto; display: none; box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-  }
-  .street-suggestions.show { display: block; }
-  .street-suggestion-item {
-    padding: 10px 13px; font-size: 13px; color: #e0eef5; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
-  .street-suggestion-item:last-child { border-bottom: none; }
-  .street-suggestion-item:active, .street-suggestion-item.highlight { background: rgba(201,168,76,0.18); }
-  .street-suggestion-empty { padding: 10px 13px; font-size: 12px; color: #5a7a8a; text-align: center; }
-  .street-picker input.valid-pick { border-color: #2ecc71; background: rgba(46,204,113,0.08); }
   input:focus, select:focus { border-color: #c9a84c; background: rgba(201,168,76,0.07); }
+  input[type=date] { color-scheme: dark; }
   ::placeholder { color: #3a5a6a; }
-
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip {
-    padding: 9px 18px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.07); color: #a0c0d0; font-size: 13px; font-weight: 700;
-    font-family: inherit; cursor: pointer;
-  }
-  .chip.selected { border: 2px solid #c9a84c; background: linear-gradient(135deg,#c9a84c,#a07830); color: #fff; }
 
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
@@ -101,18 +72,10 @@
     display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .btn-gold { background: linear-gradient(135deg,#c9a84c,#a07830); color: #fff; box-shadow: 0 3px 15px rgba(201,168,76,0.35); }
-  .btn-teal { background: linear-gradient(135deg,#1a5a5a,#0d3a3a); color: #7effea; }
   .btn-green { background: linear-gradient(135deg,#1a5a3a,#0d3a25); color: #7eff7f; }
   .btn-outline { background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.15); color: #a0c0d0; }
   .btn:disabled { opacity: .4; cursor: not-allowed; }
   .btn:active:not(:disabled) { opacity: .8; }
-
-  #map { width: 100%; height: 46vh; min-height: 320px; border-radius: 16px; border: 1.5px solid rgba(201,168,76,0.35); overflow: hidden; }
-
-  .map-wrap { padding: 12px 14px 4px; }
-  .map-toolbar { display:flex; gap:8px; margin-top:10px; flex-wrap: wrap; }
-  .map-toolbar .btn { flex: 1 1 30%; min-width: 96px; padding: 11px 6px; font-size: 12.5px; }
-  .btn.tool-active { background: linear-gradient(135deg,#c9a84c,#a07830); color:#fff; border-color:#c9a84c; box-shadow: 0 2px 10px rgba(201,168,76,0.4); }
 
   .status-box {
     margin-top: 10px; padding: 10px 12px; border-radius: 10px;
@@ -130,27 +93,35 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .result-group { margin-top: 14px; }
-  .result-group-title { color:#c9a84c; font-size:13px; font-weight:800; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; }
-  .result-group-title .count { color:#6a95a5; font-size:11px; font-weight:600; }
-  .chip-list { display:flex; flex-wrap:wrap; gap:6px; }
-  .chip-item { background: rgba(201,168,76,0.13); border:1px solid rgba(201,168,76,0.3); border-radius: 20px; padding: 6px 12px; font-size:12px; color:#e8f4fc; }
-  .shop-item {
-    display:flex; justify-content:space-between; align-items:center; gap:8px;
-    background: rgba(255,255,255,0.04); border-radius:10px; padding:9px 12px; margin-bottom:6px;
-    font-size:13px; color:#dbeaf2;
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    padding: 9px 18px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.07); color: #a0c0d0; font-size: 13px; font-weight: 700;
+    font-family: inherit; cursor: pointer;
   }
-  .shop-item .cat { font-size:11px; color:#c9a84c; background:rgba(201,168,76,0.12); padding:2px 9px; border-radius:20px; flex-shrink:0; }
+  .chip.selected { border: 2px solid #c9a84c; background: linear-gradient(135deg,#c9a84c,#a07830); color: #fff; }
+  .chip-item { background: rgba(201,168,76,0.13); border:1px solid rgba(201,168,76,0.3); border-radius: 20px; padding: 8px 16px; font-size:13px; color:#e8f4fc; }
   .empty-note { color:#3a5a6a; font-size:12px; text-align:center; padding: 14px; }
 
-  .legend { display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; }
-  .legend-item { display:flex; align-items:center; gap:6px; font-size:11px; color:#8fb0c0; }
-  .legend-swatch { width:14px; height:14px; border-radius:4px; flex-shrink:0; }
+  .result-group-title { color:#c9a84c; font-size:14px; font-weight:800; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+  .result-group-title .count { color:#6a95a5; font-size:12px; font-weight:600; }
 
-  .export-row { display:flex; gap:10px; margin-top:14px; }
-  .export-row .btn { flex:1; }
+  /* قائمة بحث الشوارع (كتابة أحرف افتتاحية للتصفية) */
+  .street-picker { position: relative; }
+  .street-suggestions {
+    position: absolute; top: calc(100% + 4px); right: 0; left: 0; z-index: 600;
+    background: #0f2233; border: 1.5px solid #c9a84c; border-radius: 10px;
+    max-height: 220px; overflow-y: auto; display: none; box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  }
+  .street-suggestions.show { display: block; }
+  .street-suggestion-item {
+    padding: 10px 13px; font-size: 13px; color: #e0eef5; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .street-suggestion-item:last-child { border-bottom: none; }
+  .street-suggestion-item:active, .street-suggestion-item.highlight { background: rgba(201,168,76,0.18); }
+  .street-suggestion-empty { padding: 10px 13px; font-size: 12px; color: #5a7a8a; text-align: center; }
+  .street-picker input.valid-pick { border-color: #2ecc71; background: rgba(46,204,113,0.08); }
 
-  /* off-screen report renderer used for PDF capture */
   #report-render {
     position: fixed; top: -99999px; left: -99999px;
     width: 780px; background: #ffffff; color:#0f2233; direction: rtl; font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
@@ -161,70 +132,76 @@
   #report-render h2 { font-size: 15px; color:#a07830; margin: 18px 0 8px; }
   #report-render .grid-tags { display:flex; flex-wrap:wrap; gap:6px; }
   #report-render .tag { background:#f4ead0; border:1px solid #dcc27a; color:#5a4210; border-radius:16px; padding:5px 12px; font-size:12px; }
-  #report-render table { width:100%; border-collapse: collapse; font-size:12px; margin-top:4px; }
-  #report-render td, #report-render th { border:1px solid #ddd; padding:6px 8px; text-align:right; }
-  #report-render th { background:#0f2233; color:#fff; }
-  #report-render tr:nth-child(even) { background:#f7f7f7; }
-
-  /* تلميحات popup */
-  .leaflet-popup-content { direction: rtl; text-align: right; font-family: inherit; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="topbar-logo">🗺️</div>
+  <div class="topbar-logo">🛣️</div>
   <div>
-    <div class="topbar-title">خريطة المربع السكني</div>
-    <div class="topbar-sub" style="color:#c9a84c;font-weight:700">حي المنتزة أول - الإسكندرية - مصر</div>
-    <div class="topbar-sub" id="topbar-status">حدد المربع السكني للبدء</div>
-  </div>
-</div>
-
-<div class="tabs">
-  <button class="tab-btn active" id="tab-btn-draw" onclick="switchTab('draw')">✏️ رسم</button>
-  <button class="tab-btn" id="tab-btn-streets" onclick="switchTab('streets')">🏘️ 4 شوارع</button>
-  <button class="tab-btn" id="tab-btn-single" onclick="switchTab('single')">🛣️ شارع واحد</button>
-</div>
-
-<div style="padding: 10px 14px 0">
-  <div style="background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); border-radius:12px; padding:10px 13px; display:flex; align-items:center; gap:8px; font-size:12px; color:#c9a84c; font-weight:700;">
-    📍 نطاق العمل: مصر - محافظة الإسكندرية - حي المنتزه أول
+    <div class="topbar-title">دليل الشوارع</div>
+    <div class="topbar-sub" style="color:#c9a84c;font-weight:700">محافظة الإسكندرية - مصر</div>
   </div>
 </div>
 
 <div style="padding: 10px 14px 0">
   <div class="card" style="margin-bottom:0">
-    <h3>🖊️ اسم الباحث</h3>
-    <div class="hint" style="margin-bottom:8px">يظهر اسم الباحث كملصق على المربع في الخريطة، وفي تقرير PDF.</div>
+    <h3>📍 الحي</h3>
+    <div class="hint" style="margin-bottom:8px">اختر الحي أولاً لتحميل أسماء شوارعه فقط (بدل تحميل كل شوارع المحافظة دفعة واحدة، لضمان سرعة واستقرار البحث).</div>
+    <select id="districtSelect" onchange="onDistrictChange()">
+      <option value="">-- اختر الحي --</option>
+      <option value="حي شرق">حي شرق</option>
+      <option value="حي وسط">حي وسط</option>
+      <option value="حي غرب">حي غرب</option>
+      <option value="حي الجمرك">حي الجمرك</option>
+      <option value="حي المنتزة أول">حي المنتزة أول</option>
+      <option value="حي المنتزة ثان">حي المنتزة ثان</option>
+      <option value="حي العامرية">حي العامرية</option>
+      <option value="حي العجمي">حي العجمي</option>
+      <option value="حي الدخيلة">حي الدخيلة</option>
+    </select>
+    <button type="button" class="btn btn-outline" style="margin-top:10px" onclick="refreshStreetList()">🔄 تحديث قائمة شوارع الحي المختار</button>
+    <div class="status-box" id="districtStatus"></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" id="tab-btn-single" onclick="switchTab('single')">🛣️ شارع واحد</button>
+  <button class="tab-btn" id="tab-btn-four" onclick="switchTab('four')">🏘️ 4 شوارع</button>
+</div>
+
+<div style="padding: 10px 14px 0">
+  <div class="card" style="margin-bottom:0">
+    <h3>🖊️ اسم الباحث (اختياري)</h3>
     <input type="text" id="researcherName" placeholder="اكتب اسم الباحث هنا" oninput="onResearcherNameChange()">
   </div>
 </div>
 
-<div class="map-wrap">
-  <div id="map"></div>
-  <div class="map-toolbar">
-    <button class="btn btn-outline" id="rectBtn" onclick="startDrawing()">🟦 مربع بالقلم</button>
-    <button class="btn btn-outline" id="freehandBtn" onclick="toggleFreehand()">✋ رسم حر باليد</button>
-    <button class="btn btn-outline" onclick="confirmClearSelection()">🗑 مسح التحديد</button>
-  </div>
-</div>
-
-<div class="panel active" id="panel-draw">
+<!-- تبويب: شارع واحد -->
+<div class="panel active" id="panel-single">
   <div class="card">
-    <h3>📍 الطريقة الأولى: الرسم المباشر</h3>
-    <div class="hint">
-      الخريطة معروضة مسبقاً على نطاق <strong>حي المنتزة أول - الإسكندرية</strong> ولا يمكن الخروج منه. قرّب الخريطة على المنطقة السكنية المطلوبة داخل الحي، ثم اختر إحدى الطريقتين:<br>
-      🟦 <strong>مربع بالقلم</strong>: اضغط الزر، ثم اسحب من زاوية المربع إلى الزاوية المقابلة برسمة واحدة متصلة.<br>
-      ✋ <strong>رسم حر باليد</strong>: اضغط الزر، ثم ارسم حدود المنطقة بإصبعك أو بقلم الشاشة بأي شكل غير منتظم مباشرة فوق الخريطة، وارفع إصبعك لإنهاء الرسم.
+    <h3>🛣️ الشوارع الملاصقة لشارع واحد</h3>
+    <div class="hint">اكتب أول حرف أو حرفين من اسم الشارع واختره من القائمة، وسيبحث البرنامج عن كل الشوارع المتصلة به مباشرة (المتفرّعة منه أو المتقاطعة معه).</div>
+    <button type="button" class="btn btn-outline" style="margin-bottom:12px" onclick="refreshStreetList()">🔄 تحديث قائمة الشوارع</button>
+    <div class="field"><label>اسم الشارع</label>
+      <div class="street-picker"><input type="text" id="stSingle" placeholder="اكتب لتبحث..." autocomplete="off"><div class="street-suggestions" id="stSingle-list"></div></div>
     </div>
+    <button class="btn btn-gold" id="singleBtn" onclick="findAdjacentStreets()">🔍 بحث عن الشوارع الملاصقة</button>
+    <div class="status-box" id="singleStatus"></div>
+  </div>
+
+  <div class="card" id="singleResultsCard" hidden>
+    <div class="result-group-title"><span>🛣️ الشوارع الملاصقة</span><span class="count" id="singleResultsCount">0</span></div>
+    <div class="chips" id="singleResultsList"></div>
+    <div id="singleCenterLink" style="margin-top:12px"></div>
   </div>
 </div>
 
-<div class="panel" id="panel-streets">
+<!-- تبويب: أربعة شوارع -->
+<div class="panel" id="panel-four">
   <div class="card">
-    <h3>🏘️ الطريقة الثانية: تحديد بأسماء الشوارع الأربعة</h3>
-    <div class="hint">اكتب أول حرف أو حرفين من اسم كل شارع، وستظهر لك الشوارع المطابقة لاختيار الصحيح منها (مبنية تلقائياً من شوارع حي المنتزة أول، وتُحفظ على جهازك بعد أول تحميل).</div>
+    <h3>🏘️ الشوارع الرئيسية داخل حدود أربعة شوارع</h3>
+    <div class="hint">اختر أسماء الشوارع الأربعة المحيطة بالمنطقة، وسيبحث البرنامج عن الشوارع الرئيسية الداخلية الواقعة بينها.</div>
     <button type="button" class="btn btn-outline" style="margin-bottom:12px" onclick="refreshStreetList()">🔄 تحديث قائمة الشوارع</button>
     <div class="row2">
       <div class="field"><label>الشارع 1 (شمال)</label>
@@ -242,426 +219,195 @@
         <div class="street-picker"><input type="text" id="st4" placeholder="اكتب لتبحث..." autocomplete="off"><div class="street-suggestions" id="st4-list"></div></div>
       </div>
     </div>
-    <button class="btn btn-gold" id="geocodeBtn" onclick="geocodeStreets()">📍 تحديد المربع على الخريطة</button>
-    <div class="status-box" id="geocodeStatus"></div>
+    <button class="btn btn-gold" id="fourBtn" onclick="findInternalStreets()">🔍 بحث عن الشوارع الداخلية</button>
+    <div class="status-box" id="fourStatus"></div>
   </div>
-</div>
 
-<div class="panel" id="panel-single">
-  <div class="card">
-    <h3>🛣️ الطريقة الثالثة: شارع واحد فقط كمنطقة بحث</h3>
-    <div class="hint">اكتب أول حرف أو حرفين من اسم الشارع واختره من القائمة، وستُحدَّد منطقة بحث ضيقة على امتداد هذا الشارع فقط (وليس مربعاً واسعاً حوله).</div>
-    <button type="button" class="btn btn-outline" style="margin-bottom:12px" onclick="refreshStreetList()">🔄 تحديث قائمة الشوارع</button>
-    <div class="field"><label>اسم الشارع</label>
-      <div class="street-picker"><input type="text" id="stSingle" placeholder="اكتب لتبحث..." autocomplete="off"><div class="street-suggestions" id="stSingle-list"></div></div>
-    </div>
-    <button class="btn btn-gold" id="singleStreetBtn" onclick="selectSingleStreet()">📍 تحديد هذا الشارع على الخريطة</button>
-    <div class="status-box" id="singleStreetStatus"></div>
+  <div class="card" id="fourResultsCard" hidden>
+    <div class="result-group-title"><span>🏘️ الشوارع الرئيسية الداخلية</span><span class="count" id="fourResultsCount">0</span></div>
+    <div class="chips" id="fourResultsList"></div>
+    <div id="fourCenterLink" style="margin-top:12px"></div>
   </div>
 </div>
 
 <div style="padding: 0 14px">
-  <button class="btn btn-teal" id="fetchBtn" onclick="fetchAreaData()" disabled>🔍 استخراج الشوارع والمحلات داخل المربع</button>
-  <div class="status-box" id="fetchStatus"></div>
-</div>
-
-<div style="padding: 0 14px" id="resultsCard" hidden>
   <div class="card">
-    <h3>📊 نتائج المربع السكني</h3>
-    <div class="legend">
-      <div class="legend-item"><span class="legend-swatch" style="background:#e53935"></span> الشوارع الرئيسية</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#1e88e5"></span> محلات ومنشآت</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#e53935;border:2px dashed #e53935"></span> حدود منطقة البحث</div>
+    <h3>📄 تصدير النتائج</h3>
+    <div class="row2">
+      <div class="field"><label>تاريخ البحث</label>
+        <input type="date" id="searchDate" onchange="onDatesChange()">
+      </div>
+      <div class="field"><label>تاريخ القافلة</label>
+        <input type="date" id="convoyDate" onchange="onDatesChange()">
+      </div>
     </div>
-
-    <div class="result-group">
-      <div class="result-group-title"><span>🚧 أهم الشوارع</span><span class="count" id="streetsCount">0</span></div>
-      <div id="streetsList" class="chip-list"></div>
-    </div>
-
-    <div class="result-group">
-      <div class="result-group-title"><span>🏪 أهم المحلات والمنشآت</span><span class="count" id="shopsCount">0</span></div>
-      <div id="shopsList"></div>
-    </div>
-
-    <div class="result-group">
-      <div class="result-group-title"><span>👥 الكثافة السكانية التقديرية</span></div>
-      <div id="densityBox" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:12px 14px;font-size:13px;color:#dbeaf2;line-height:2;"></div>
-      <div class="hint" style="margin-top:6px">⚠️ تقدير تقريبي فقط بناءً على عدد المباني السكنية وارتفاعها في بيانات OpenStreetMap وافتراضات متوسطة لحجم الأسرة، وليس إحصاءً رسمياً دقيقاً.</div>
-    </div>
-
-    <div class="field" style="margin-top:14px">
+    <div class="field" style="margin-bottom:10px">
       <label>مقاس ورق الطباعة</label>
       <div class="chips">
         <button type="button" class="chip selected" id="sizeA3" onclick="setPaperSize('a3')">A3</button>
         <button type="button" class="chip" id="sizeA4" onclick="setPaperSize('a4')">A4</button>
       </div>
     </div>
-
-    <div class="export-row">
-      <button class="btn btn-green" onclick="exportPDF()" id="pdfBtn">📄 تصدير PDF (خريطة + بيان)</button>
-    </div>
+    <button class="btn btn-green" onclick="exportPDF()" id="pdfBtn">📄 تصدير PDF لآخر نتيجة (مع كروكي)</button>
   </div>
 </div>
 
-<!-- off-screen renderer for the report page (captured into the PDF) -->
 <div id="report-render"></div>
+<div style="height:0;overflow:hidden;"><div id="pdf-map" style="width:700px;height:460px;"></div></div>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-// ===================== إعداد الخريطة =====================
-// نطاق العمل الثابت: مصر - الإسكندرية - حي المنتزه أول
-const DISTRICT_LABEL = 'حي المنتزه أول، الإسكندرية، مصر';
-// صندوق تقريبي يغطي حي المنتزه أول بالكامل (سيدي بشر، ميامي، الرأس السوداء، العوايد، السيوف، المنشية البحرية)
-const DISTRICT_BOUNDS = L.latLngBounds([31.235, 29.93], [31.365, 30.09]);
+// نطاق العمل: محافظة الإسكندرية، لكن يُحدَّد حياً واحداً فقط في كل مرة (يختاره المستخدم) لضمان سرعة واستقرار البحث
+let currentDistrictName = null;
+let currentDistrictBbox = null;
+function districtBboxStr() { return `${currentDistrictBbox.south},${currentDistrictBbox.west},${currentDistrictBbox.north},${currentDistrictBbox.east}`; }
 
-const map = L.map('map', {
-  zoomControl: true,
-  maxBounds: DISTRICT_BOUNDS.pad(0.08),
-  maxBoundsViscosity: 0.6,
-  minZoom: 12
-}).fitBounds(DISTRICT_BOUNDS);
+const OVERPASS_ENDPOINTS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.openstreetmap.ru/api/interpreter'
+];
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; OpenStreetMap &copy; CARTO',
-  maxZoom: 20,
-  crossOrigin: true
-}).addTo(map);
-
-// إبراز تقريبي لحدود الحي (للتوجيه البصري فقط، ليست حدوداً إدارية رسمية دقيقة)
-L.rectangle(DISTRICT_BOUNDS, { color:'#4a7a90', weight:1.5, dashArray:'4,6', fillOpacity:0, interactive:false }).addTo(map);
-
-let selectedBounds = null;
-let selectedPolygonLatLngs = null; // عند التحديد بالرسم الحر
-let selectionLayer = null;
-let streetsLayerGroup = L.layerGroup().addTo(map);
-let shopsLayerGroup = L.layerGroup().addTo(map);
-let lastStreets = [];
-let lastShops = [];
-let lastStreetSegments = [];
-let lastDensity = null; // تقدير الكثافة السكانية لآخر منطقة تم استخراجها
-let researcherName = '';
-let researcherMarker = null;
-let paperSize = 'a3';
-
-function clampToDistrict(bounds) {
-  const south = Math.max(bounds.getSouth(), DISTRICT_BOUNDS.getSouth());
-  const west  = Math.max(bounds.getWest(),  DISTRICT_BOUNDS.getWest());
-  const north = Math.min(bounds.getNorth(), DISTRICT_BOUNDS.getNorth());
-  const east  = Math.min(bounds.getEast(),  DISTRICT_BOUNDS.getEast());
-  return L.latLngBounds([south, west], [north, east]);
-}
-
-function setSelection(bounds) {
-  bounds = clampToDistrict(bounds);
-  selectedBounds = bounds;
-  selectedPolygonLatLngs = null;
-  if (selectionLayer && map.hasLayer(selectionLayer)) map.removeLayer(selectionLayer);
-  selectionLayer = L.rectangle(bounds, { color: '#e53935', weight: 3, dashArray: '6,4', fillOpacity: 0.06 }).addTo(map);
-  map.fitBounds(bounds.pad(0.06), { maxZoom: 19 });
-  document.getElementById('fetchBtn').disabled = false;
-  document.getElementById('topbar-status').textContent = 'تم تحديد المربع — اضغط استخراج الشوارع والمحلات';
-  hideResults();
-  updateCenterMarker();
-}
-
-function simplifyPoints(pts, maxCount) {
-  if (pts.length <= maxCount) return pts;
-  const step = Math.ceil(pts.length / maxCount);
-  const out = [];
-  for (let i = 0; i < pts.length; i += step) out.push(pts[i]);
-  out.push(pts[pts.length - 1]);
-  return out;
-}
-
-function setSelectionPolygon(rawLatLngs) {
-  const pts = simplifyPoints(rawLatLngs, 300);
-  // قص كل نقطة داخل حدود الحي حتى لا يتجاوز الرسم الحر النطاق المسموح
-  selectedPolygonLatLngs = pts.map(p => L.latLng(
-    Math.min(Math.max(p.lat, DISTRICT_BOUNDS.getSouth()), DISTRICT_BOUNDS.getNorth()),
-    Math.min(Math.max(p.lng, DISTRICT_BOUNDS.getWest()), DISTRICT_BOUNDS.getEast())
-  ));
-  const bounds = L.polygon(selectedPolygonLatLngs).getBounds();
-  selectedBounds = bounds;
-
-  if (selectionLayer && map.hasLayer(selectionLayer)) map.removeLayer(selectionLayer);
-  selectionLayer = L.polygon(selectedPolygonLatLngs, { color:'#e53935', weight:3, dashArray:'6,4', fillOpacity:0.08 }).addTo(map);
-
-  map.fitBounds(bounds.pad(0.06), { maxZoom: 19 });
-  document.getElementById('fetchBtn').disabled = false;
-  document.getElementById('topbar-status').textContent = 'تم تحديد المنطقة بالرسم الحر — اضغط استخراج الشوارع والمحلات';
-  hideResults();
-  updateCenterMarker();
-}
-
-// ===================== أداة رسم موحّدة (مربع + رسم حر) بدون أي مكتبات خارجية =====================
-// مبنية بالكامل على أحداث اللمس/الماوس الأساسية في المتصفح، دون الاعتماد على أي إضافة خارجية
-// لتفادي أي عطل ناتج عن بطء أو حظر تحميل مكتبات إضافية.
-let drawTool = null;        // 'rect' | 'freehand' | null
-let isDrawingActive = false;
-let freehandLatLngs = [];
-let freehandLine = null;
-let tempRectLayer = null;
-let rectStartLatLng = null;
-const mapEl = map.getContainer();
-
-function lockMapInteractions() {
-  map.dragging.disable();
-  if (map.tap) map.tap.disable();
-  if (map.doubleClickZoom) map.doubleClickZoom.disable();
-  if (map.touchZoom) map.touchZoom.disable();
-  if (map.boxZoom) map.boxZoom.disable();
-  if (map.scrollWheelZoom) map.scrollWheelZoom.disable();
-}
-function unlockMapInteractions() {
-  map.dragging.enable();
-  if (map.tap) map.tap.enable();
-  if (map.doubleClickZoom) map.doubleClickZoom.enable();
-  if (map.touchZoom) map.touchZoom.enable();
-  if (map.boxZoom) map.boxZoom.enable();
-  if (map.scrollWheelZoom) map.scrollWheelZoom.enable();
-}
-
-function startDrawing() { activateTool('rect'); }
-function toggleFreehand() {
-  if (drawTool === 'freehand') { deactivateTool(); return; }
-  activateTool('freehand');
-}
-
-function activateTool(tool) {
-  deactivateTool();
-  clearSelection(true);
-  drawTool = tool;
-  lockMapInteractions();
-  mapEl.style.cursor = 'crosshair';
-  mapEl.style.touchAction = 'none';
-  if (tool === 'freehand') {
-    const btn = document.getElementById('freehandBtn'); if (btn) btn.classList.add('tool-active');
-    document.getElementById('topbar-status').textContent = 'ارسم حدود المنطقة بإصبعك أو القلم دون رفعه، ثم ارفعه لإنهاء الرسم';
-  } else {
-    const btn = document.getElementById('rectBtn'); if (btn) btn.classList.add('tool-active');
-    document.getElementById('topbar-status').textContent = 'اسحب إصبعك أو القلم من زاوية المربع إلى الزاوية المقابلة، ثم ارفعه';
-  }
-}
-
-function deactivateTool() {
-  drawTool = null;
-  isDrawingActive = false;
-  unlockMapInteractions();
-  mapEl.style.cursor = '';
-  mapEl.style.touchAction = '';
-  const fb = document.getElementById('freehandBtn'); if (fb) fb.classList.remove('tool-active');
-  const rb = document.getElementById('rectBtn'); if (rb) rb.classList.remove('tool-active');
-  if (tempRectLayer) { map.removeLayer(tempRectLayer); tempRectLayer = null; }
-  if (freehandLine) { map.removeLayer(freehandLine); freehandLine = null; }
-}
-
-function ptFromClient(clientX, clientY) {
-  const rect = mapEl.getBoundingClientRect();
-  const point = L.point(clientX - rect.left, clientY - rect.top);
-  return map.containerPointToLatLng(point);
-}
-
-function handleDrawStart(latlng) {
-  isDrawingActive = true;
-  if (drawTool === 'rect') {
-    rectStartLatLng = latlng;
-    tempRectLayer = L.rectangle(L.latLngBounds(latlng, latlng), { color:'#e53935', weight:3, dashArray:'6,4', fillOpacity:0.06 }).addTo(map);
-  } else if (drawTool === 'freehand') {
-    freehandLatLngs = [latlng];
-    freehandLine = L.polyline(freehandLatLngs, { color:'#e53935', weight:4 }).addTo(map);
-  }
-}
-function handleDrawMove(latlng) {
-  if (!isDrawingActive) return;
-  if (drawTool === 'rect' && tempRectLayer) {
-    tempRectLayer.setBounds(L.latLngBounds(rectStartLatLng, latlng));
-  } else if (drawTool === 'freehand' && freehandLine) {
-    freehandLatLngs.push(latlng);
-    freehandLine.setLatLngs(freehandLatLngs);
-  }
-}
-function handleDrawEnd() {
-  if (!drawTool || !isDrawingActive) return;
-  isDrawingActive = false;
-  if (drawTool === 'rect' && tempRectLayer) {
-    const bounds = tempRectLayer.getBounds();
-    map.removeLayer(tempRectLayer); tempRectLayer = null;
-    if (bounds.getNorth() - bounds.getSouth() > 0.0002 && bounds.getEast() - bounds.getWest() > 0.0002) {
-      setSelection(bounds);
-      saveState();
-    } else {
-      document.getElementById('topbar-status').textContent = 'المربع صغير جداً — حاول رسمه بشكل أوضح';
-    }
-  } else if (drawTool === 'freehand' && freehandLine) {
-    const pts = freehandLatLngs;
-    map.removeLayer(freehandLine); freehandLine = null;
-    if (pts.length >= 3) {
-      setSelectionPolygon(pts);
-      saveState();
-    } else {
-      document.getElementById('topbar-status').textContent = 'الرسم قصير جداً — حاول رسم شكل أوضح';
-    }
-  }
-  freehandLatLngs = [];
-  deactivateTool();
-}
-
-// أحداث اللمس (الأساسية للهاتف/التابلت وقلم الشاشة)
-mapEl.addEventListener('touchstart', (e) => {
-  if (!drawTool || !e.touches.length) return;
-  e.preventDefault();
-  const t = e.touches[0];
-  handleDrawStart(ptFromClient(t.clientX, t.clientY));
-}, { passive: false });
-
-mapEl.addEventListener('touchmove', (e) => {
-  if (!drawTool || !isDrawingActive || !e.touches.length) return;
-  e.preventDefault();
-  const t = e.touches[0];
-  handleDrawMove(ptFromClient(t.clientX, t.clientY));
-}, { passive: false });
-
-mapEl.addEventListener('touchend', (e) => {
-  if (!drawTool) return;
-  e.preventDefault();
-  handleDrawEnd();
-}, { passive: false });
-
-mapEl.addEventListener('touchcancel', () => { if (drawTool) handleDrawEnd(); });
-
-// أحداث الماوس (لأجهزة الكمبيوتر واختبار سطح المكتب)
-mapEl.addEventListener('mousedown', (e) => {
-  if (!drawTool) return;
-  e.preventDefault();
-  handleDrawStart(ptFromClient(e.clientX, e.clientY));
-});
-mapEl.addEventListener('mousemove', (e) => {
-  if (!drawTool || !isDrawingActive) return;
-  handleDrawMove(ptFromClient(e.clientX, e.clientY));
-});
-window.addEventListener('mouseup', () => { if (drawTool) handleDrawEnd(); });
-
-// ===================== ملصق اسم الباحث على المربع =====================
-function onResearcherNameChange() {
-  researcherName = document.getElementById('researcherName').value.trim();
-  updateCenterMarker();
-  saveState();
-}
-
-// نقطة مرجعية واحدة في مركز منطقة البحث (تمثل موقع الوصول للحالة)، مع اسم الباحث ملصقاً بجانبها
-function updateCenterMarker() {
-  if (researcherMarker) { map.removeLayer(researcherMarker); researcherMarker = null; }
-  if (!selectedBounds) return;
-  const center = selectedBounds.getCenter();
-  const nameHtml = researcherName
-    ? `<div style="margin-top:3px;background:linear-gradient(135deg,#c9a84c,#a07830);color:#fff;font-weight:800;font-size:11px;padding:4px 11px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.45);border:1.5px solid #fff;">🖊️ ${escHtml(researcherName)}</div>`
-    : '';
-  const icon = L.divIcon({
-    className: '',
-    html: `<div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-92%);cursor:pointer;">
-      <div style="font-size:32px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.65));">📍</div>
-      ${nameHtml}
-      <div style="margin-top:3px;background:rgba(15,34,51,0.92);color:#7ea8ff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:14px;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,0.4);border:1px solid #7ea8ff;">🗺️ افتح في خرائط جوجل</div>
-    </div>`,
-    iconSize: null
+async function overpassQueryOnce(q, timeoutMs) {
+  const body = 'data=' + encodeURIComponent(q);
+  const timeout = timeoutMs || 20000;
+  const attempts = OVERPASS_ENDPOINTS.map(url => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    return fetch(url, { method: 'POST', body, signal: controller.signal })
+      .then(res => { clearTimeout(timer); if (!res.ok) throw new Error('bad status'); return res.json(); })
+      .catch(err => { clearTimeout(timer); throw err; });
   });
-  researcherMarker = L.marker(center, { icon, interactive: true }).addTo(map);
-  researcherMarker.on('click', () => {
-    window.open(`https://www.google.com/maps?q=${center.lat},${center.lng}`, '_blank');
-  });
+  return Promise.any(attempts);
 }
 
-function setPaperSize(size) {
-  paperSize = size;
-  document.getElementById('sizeA3').classList.toggle('selected', size === 'a3');
-  document.getElementById('sizeA4').classList.toggle('selected', size === 'a4');
-  saveState();
+async function overpassQuery(q, timeoutMs) {
+  const delays = [1200, 2500];
+  for (let i = 0; i <= delays.length; i++) {
+    try { return await overpassQueryOnce(q, timeoutMs); }
+    catch (err) { if (i < delays.length) await new Promise(r => setTimeout(r, delays[i])); }
+  }
+  throw new Error('تعذر الاتصال بخدمة الخرائط بعد عدة محاولات — قد تكون الخوادم مزدحمة حالياً، حاول مرة أخرى بعد قليل');
 }
 
-// يطلب تأكيداً قبل مسح أي بيانات موجودة فعلياً، حتى لا يتم فقدانها بالخطأ
-function confirmClearSelection() {
-  const hasData = selectedBounds || lastStreets.length || lastShops.length || researcherName;
-  if (hasData && !confirm('سيتم مسح المربع المحدد وكل النتائج المستخرجة. هل أنت متأكد؟')) return;
-  clearSelection();
-  saveState();
+// تحديد حدود الحي جغرافياً (مرة واحدة لكل حي، ثم يُحفظ محلياً) عبر خدمة Nominatim المجانية
+// حدود احتياطية موثّقة مسبقاً (تُستخدم فقط إذا فشلت كل محاولات تحديد الحدود تلقائياً عبر الخرائط)
+const KNOWN_DISTRICT_BBOX = {
+  'حي المنتزة أول': { south: 31.235, west: 29.93, north: 31.365, east: 30.09 }
+};
+
+async function geocodeDistrictBbox(districtName) {
+  const bareName = districtName.replace(/^حي\s+/, '').trim(); // إزالة كلمة "حي" من البداية للمحاولات البديلة
+  const candidates = [
+    `${districtName}, الإسكندرية, مصر`,
+    `قسم ${bareName}, الإسكندرية, مصر`,
+    `${bareName}, الإسكندرية, مصر`,
+    `${districtName}, Alexandria, Egypt`,
+    `${bareName}, Alexandria, Egypt`,
+    `${bareName} district, Alexandria Governorate, Egypt`
+  ];
+  for (let i = 0; i < candidates.length; i++) {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(candidates[i])}`;
+      const res = await fetch(url, { headers: { 'Accept-Language': 'ar' } });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.length) {
+          const bb = data[0].boundingbox; // [south, north, west, east] كنصوص
+          return { south: parseFloat(bb[0]), north: parseFloat(bb[1]), west: parseFloat(bb[2]), east: parseFloat(bb[3]) };
+        }
+      }
+    } catch (e) { /* جرّب الصيغة التالية */ }
+    if (i < candidates.length - 1) await new Promise(r => setTimeout(r, 1100)); // احترام حد طلبات Nominatim
+  }
+  if (KNOWN_DISTRICT_BBOX[districtName]) return KNOWN_DISTRICT_BBOX[districtName];
+  throw new Error('لم يتم العثور على حدود هذا الحي رغم تجربة عدة صيغ لاسمه — قد يكون اسمه مختلفاً في بيانات الخريطة');
 }
 
-function clearSelection(silent) {
-  deactivateTool();
-  streetsLayerGroup.clearLayers();
-  shopsLayerGroup.clearLayers();
-  if (selectionLayer && map.hasLayer(selectionLayer)) map.removeLayer(selectionLayer);
-  if (researcherMarker) { map.removeLayer(researcherMarker); researcherMarker = null; }
-  selectionLayer = null; selectedBounds = null; selectedPolygonLatLngs = null;
-  lastStreets = []; lastShops = []; lastStreetSegments = []; lastDensity = null;
-  document.getElementById('fetchBtn').disabled = true;
-  if (!silent) document.getElementById('topbar-status').textContent = 'حدد المربع السكني للبدء';
-  hideResults();
-}
-
-function hideResults() { document.getElementById('resultsCard').hidden = true; }
-
-// ===================== التبويبات =====================
-function switchTab(tab) {
-  document.getElementById('tab-btn-draw').classList.toggle('active', tab === 'draw');
-  document.getElementById('tab-btn-streets').classList.toggle('active', tab === 'streets');
-  document.getElementById('tab-btn-single').classList.toggle('active', tab === 'single');
-  document.getElementById('panel-draw').classList.toggle('active', tab === 'draw');
-  document.getElementById('panel-streets').classList.toggle('active', tab === 'streets');
-  document.getElementById('panel-single').classList.toggle('active', tab === 'single');
-  if (tab === 'streets' || tab === 'single') loadDistrictStreetNames();
-  saveState();
-}
-
-// ===================== قائمة الشوارع المنسدلة + تحديد المربع من هندسة الشوارع الفعلية =====================
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s) { return escHtml(s); }
 function setStatus(elId, msg, type) {
   const el = document.getElementById(elId);
   el.className = 'status-box show' + (type ? ' ' + type : '');
   el.innerHTML = msg;
 }
 
-let streetGeometryMap = new Map(); // اسم الشارع -> مصفوفة نقاط [lat, lon]
+// ===================== قائمة أسماء شوارع الحي المختار (لتغذية حقول البحث) + تخزين محلي =====================
+let streetGeometryMap = new Map(); // اسم الشارع -> مصفوفة نقاط [lat, lon] (مراكز تقريبية)
 let streetsLoaded = false;
 let streetsLoading = false;
-let streetPickerSelections = {}; // معرف الحقل -> اسم الشارع المختار فعلياً من نتائج البحث
+let researcherName = '';
+let searchDate = '';
+let convoyDate = '';
+let paperSize = 'a3';
+let streetPickerSelections = {};
+let lastResult = null; // { mode, title, items, extra }
+
+function districtSlug(name) { return name.replace(/\s+/g, '_'); }
+
+function onDistrictChange() {
+  const sel = document.getElementById('districtSelect');
+  const name = sel.value;
+  if (!name) return;
+  currentDistrictName = name;
+  currentDistrictBbox = null;
+  streetGeometryMap = new Map();
+  streetsLoaded = false;
+  // إعادة تعيين اختيارات الشوارع الحالية لأنها كانت تخص حياً مختلفاً
+  ['st1','st2','st3','st4','stSingle'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.classList.remove('valid-pick'); }
+    streetPickerSelections[id] = null;
+  });
+  document.getElementById('singleResultsCard').hidden = true;
+  document.getElementById('fourResultsCard').hidden = true;
+  lastResult = null;
+  saveState();
+  loadDistrictStreetNames();
+}
 
 async function loadDistrictStreetNames(forceRefresh) {
+  if (!currentDistrictName) {
+    setStatus('districtStatus', '⚠️ الرجاء اختيار الحي أولاً', 'err');
+    return;
+  }
   if (!forceRefresh && (streetsLoaded || streetsLoading)) return;
   streetsLoading = true;
 
-  const CACHE_KEY = 'montaza_streets_cache_v2';
-  const CACHE_TTL_MS = 90 * 24 * 60 * 60 * 1000; // 90 يوماً — تُحفظ فعلياً حتى يضغط المستخدم "تحديث القائمة"
+  const CACHE_KEY = 'alex_streets_cache_v1_' + districtSlug(currentDistrictName);
+  const BBOX_CACHE_KEY = 'alex_district_bbox_v1_' + districtSlug(currentDistrictName);
+  const CACHE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+
   if (!forceRefresh) {
     try {
       const cachedRaw = localStorage.getItem(CACHE_KEY);
-      if (cachedRaw) {
+      const bboxRaw = localStorage.getItem(BBOX_CACHE_KEY);
+      if (cachedRaw && bboxRaw) {
         const cached = JSON.parse(cachedRaw);
         if (cached && cached.ts && (Date.now() - cached.ts) < CACHE_TTL_MS && cached.streets && cached.streets.length) {
+          currentDistrictBbox = JSON.parse(bboxRaw);
           streetGeometryMap = new Map(cached.streets);
           streetsLoaded = true; streetsLoading = false;
           restoreStreetSelections();
-          setStatus('geocodeStatus', `✅ تم تحميل ${streetGeometryMap.size} اسم شارع فوراً من الذاكرة المحفوظة داخل الجهاز.`, 'ok');
-          setStatus('singleStreetStatus', `✅ تم تحميل ${streetGeometryMap.size} اسم شارع.`, 'ok');
-          return; // تم التحميل الفوري، لا حاجة للاتصال بالشبكة
+          setStatus('districtStatus', `✅ تم تحميل ${streetGeometryMap.size} اسم شارع في "${currentDistrictName}" فوراً من الذاكرة المحفوظة.`, 'ok');
+          return;
         }
       }
-    } catch (e) { /* تجاهل أخطاء التخزين المحلي والمتابعة بالتحميل من الشبكة */ }
+    } catch (e) { /* تجاهل */ }
   }
 
-  setStatus('geocodeStatus', '<span class="spinner"></span> جارٍ تحميل أسماء الشوارع داخل حي المنتزة أول (قد يستغرق حتى 20 ثانية أول مرة فقط)...');
-  setStatus('singleStreetStatus', '<span class="spinner"></span> جارٍ تحميل أسماء الشوارع...');
+  setStatus('districtStatus', `<span class="spinner"></span> جارٍ تحديد حدود "${currentDistrictName}" وتحميل أسماء شوارعه...`);
 
   try {
-    const bbox = bboxStr(DISTRICT_BOUNDS);
-    // نطلب مركز كل شارع فقط (وليس كامل هندسته) لتقليل حجم البيانات وتسريع التحميل بشكل كبير
+    if (!currentDistrictBbox) currentDistrictBbox = await geocodeDistrictBbox(currentDistrictName);
     const q = `[out:json][timeout:25];
-      way["highway"~"^(primary|secondary|tertiary|unclassified|residential|living_street|pedestrian|service)$"]["name"](${bbox});
+      way["highway"~"^(primary|secondary|tertiary|unclassified|residential|living_street|pedestrian|service)$"]["name"](${districtBboxStr()});
       out center tags;`;
-    const data = await overpassQuery(q, 22000);
+    const data = await overpassQuery(q, 25000);
     const freshMap = new Map();
     (data.elements || []).forEach(el => {
       const c = el.center;
@@ -671,30 +417,24 @@ async function loadDistrictStreetNames(forceRefresh) {
         freshMap.get(name).push([c.lat, c.lon]);
       }
     });
-    if (!freshMap.size) throw new Error('لم يتم العثور على شوارع، حاول مرة أخرى');
+    if (!freshMap.size) throw new Error('لم يتم العثور على شوارع لهذا الحي، حاول مرة أخرى');
     streetGeometryMap = freshMap;
     streetsLoaded = true;
     restoreStreetSelections();
-    setStatus('geocodeStatus', `✅ تم تحميل ${streetGeometryMap.size} اسم شارع داخل حي المنتزة أول. اكتب اسم كل شارع لاختياره من النتائج.`, 'ok');
-    setStatus('singleStreetStatus', `✅ تم تحميل ${streetGeometryMap.size} اسم شارع.`, 'ok');
-    // حفظ في ذاكرة الجهاز حتى لا يُعاد التحميل من الإنترنت مجدداً
+    setStatus('districtStatus', `✅ تم تحميل ${streetGeometryMap.size} اسم شارع في "${currentDistrictName}".`, 'ok');
     try {
       localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), streets: Array.from(streetGeometryMap.entries()) }));
-    } catch (e) { /* قد تمتلئ الذاكرة المحلية، تجاهل بأمان */ }
+      localStorage.setItem(BBOX_CACHE_KEY, JSON.stringify(currentDistrictBbox));
+    } catch (e) {}
   } catch (err) {
-    setStatus('geocodeStatus', '❌ تعذر تحميل قائمة الشوارع: ' + err.message + ' — اضغط زر "🔄 تحديث القائمة" لإعادة المحاولة.', 'err');
-    setStatus('singleStreetStatus', '❌ تعذر تحميل قائمة الشوارع: ' + err.message, 'err');
+    setStatus('districtStatus', '❌ تعذر تحميل قائمة الشوارع: ' + err.message, 'err');
   } finally {
     streetsLoading = false;
   }
 }
+function refreshStreetList() { streetsLoaded = false; loadDistrictStreetNames(true); }
 
-function refreshStreetList() {
-  streetsLoaded = false;
-  loadDistrictStreetNames(true);
-}
-
-// ===================== قائمة بحث تفاعلية للشوارع (تصفية فورية بالأحرف الافتتاحية) =====================
+// ===================== قائمة بحث تفاعلية للشوارع =====================
 function setupStreetPickers() {
   ['st1','st2','st3','st4','stSingle'].forEach(id => {
     const input = document.getElementById(id);
@@ -740,558 +480,229 @@ function renderStreetSuggestions(id) {
   list.classList.add('show');
 }
 
-async function geocodeStreets() {
+// ===================== التبويبات =====================
+function switchTab(tab) {
+  document.getElementById('tab-btn-single').classList.toggle('active', tab === 'single');
+  document.getElementById('tab-btn-four').classList.toggle('active', tab === 'four');
+  document.getElementById('panel-single').classList.toggle('active', tab === 'single');
+  document.getElementById('panel-four').classList.toggle('active', tab === 'four');
+  saveState();
+}
+
+// ===================== الوضع الأول: الشوارع الملاصقة لشارع واحد =====================
+async function findAdjacentStreets() {
+  if (!currentDistrictBbox) { setStatus('singleStatus', '⚠️ الرجاء اختيار الحي أولاً من أعلى الصفحة', 'err'); return; }
+  const name = streetPickerSelections['stSingle'];
+  if (!name) { setStatus('singleStatus', '⚠️ الرجاء اختيار الشارع من نتائج البحث', 'err'); return; }
+
+  const btn = document.getElementById('singleBtn');
+  btn.disabled = true;
+  setStatus('singleStatus', '<span class="spinner"></span> جارٍ البحث عن الشوارع الرئيسية المتصلة بهذا الشارع...');
+  document.getElementById('singleResultsCard').hidden = true;
+
+  try {
+    const safeName = name.replace(/"/g, '\\"');
+    const mainTypes = '^(primary|secondary|tertiary|unclassified|residential|living_street)$';
+    const q = `[out:json][timeout:25];
+      way["name"="${safeName}"]["highway"~"${mainTypes}"](${districtBboxStr()})->.target;
+      node(w.target)->.pts;
+      way(bn.pts)["highway"~"${mainTypes}"]["name"]->.connected;
+      (.target; .connected;);
+      out geom;`;
+    const data = await overpassQuery(q, 25000);
+
+    const targetCoords = [];
+    const connectedMap = new Map(); // اسم الشارع -> أطول قطعة هندسية له
+    (data.elements || []).forEach(el => {
+      if (el.type !== 'way' || !el.geometry || !el.tags) return;
+      const coords = el.geometry.map(g => [g.lat, g.lon]);
+      if (el.tags.name === name) {
+        targetCoords.push(...coords);
+      } else if (el.tags.name) {
+        const existing = connectedMap.get(el.tags.name);
+        if (!existing || coords.length > existing.length) connectedMap.set(el.tags.name, coords);
+      }
+    });
+    const list = Array.from(connectedMap.keys()).sort((a,b) => a.localeCompare(b, 'ar'));
+    const centerPt = targetCoords.length ? targetCoords[Math.floor(targetCoords.length / 2)] : null;
+
+    lastResult = {
+      mode: 'single',
+      title: `الشوارع الرئيسية الملاصقة لشارع "${name}"`,
+      items: list,
+      extra: {
+        streetName: name,
+        targetCoords,
+        connected: Array.from(connectedMap.entries()).map(([n, c]) => ({ name: n, coords: c }))
+      },
+      center: centerPt ? { lat: centerPt[0], lon: centerPt[1] } : null,
+      district: currentDistrictName
+    };
+    renderSingleResults(name, list);
+    setStatus('singleStatus', list.length
+      ? `✅ تم العثور على ${list.length} شارع رئيسي متصل بشارع "${name}".`
+      : `⚠️ لم يتم العثور على شوارع رئيسية متصلة بهذا الشارع في بيانات الخريطة.`, list.length ? 'ok' : 'err');
+    saveState();
+  } catch (err) {
+    setStatus('singleStatus', '❌ حدث خطأ: ' + err.message, 'err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function renderSingleResults(streetName, list) {
+  const card = document.getElementById('singleResultsCard');
+  card.hidden = false;
+  document.getElementById('singleResultsCount').textContent = list.length;
+  const el = document.getElementById('singleResultsList');
+  el.innerHTML = list.length
+    ? list.map(n => `<span class="chip-item">🛣️ ${escHtml(n)}</span>`).join('')
+    : `<div class="empty-note">لا توجد نتائج</div>`;
+  renderCenterLink('singleCenterLink');
+}
+
+// ===================== الوضع الثاني: الشوارع الرئيسية داخل حدود أربعة شوارع =====================
+async function findInternalStreets() {
+  if (!currentDistrictBbox) { setStatus('fourStatus', '⚠️ الرجاء اختيار الحي أولاً من أعلى الصفحة', 'err'); return; }
   const ids = ['st1','st2','st3','st4'];
   const names = ids.map(id => streetPickerSelections[id]);
-  if (names.some(n => !n)) { setStatus('geocodeStatus', '⚠️ الرجاء اختيار الشوارع الأربعة من نتائج البحث (اضغط على الاسم من القائمة المقترحة أسفل كل حقل)', 'err'); return; }
+  if (names.some(n => !n)) { setStatus('fourStatus', '⚠️ الرجاء اختيار الشوارع الأربعة من نتائج البحث', 'err'); return; }
 
-  const btn = document.getElementById('geocodeBtn');
+  const btn = document.getElementById('fourBtn');
   btn.disabled = true;
-  setStatus('geocodeStatus', '<span class="spinner"></span> جارٍ تحديد المربع من مواقع الشوارع المختارة...');
+  setStatus('fourStatus', '<span class="spinner"></span> جارٍ تحديد الحدود والبحث عن الشوارع الداخلية...');
+  document.getElementById('fourResultsCard').hidden = true;
 
   try {
-    let allPts = [];
-    let foundCount = 0;
-    names.forEach(n => {
-      if (streetGeometryMap.has(n)) { allPts = allPts.concat(streetGeometryMap.get(n)); foundCount++; }
-    });
-    if (foundCount < 2) {
-      setStatus('geocodeStatus', '❌ تعذر تحديد موقع كافٍ لهذه الشوارع. جرّب اختيار شوارع أخرى أو استخدم الرسم المباشر على الخريطة.', 'err');
+    const pointSets = names.map(n => streetGeometryMap.get(n) || []);
+    if (pointSets.some(p => !p.length)) {
+      setStatus('fourStatus', '❌ تعذر تحديد موقع أحد الشوارع الأربعة.', 'err');
       btn.disabled = false; return;
     }
-    const south = Math.min(...allPts.map(p=>p[0])), north = Math.max(...allPts.map(p=>p[0]));
-    const west  = Math.min(...allPts.map(p=>p[1])), east  = Math.max(...allPts.map(p=>p[1]));
-    const padLat = Math.max((north-south)*0.08, 0.0008);
-    const padLon = Math.max((east-west)*0.08, 0.0008);
-    const bounds = L.latLngBounds([south-padLat, west-padLon], [north+padLat, east+padLon]);
+    // المشكلة السابقة: كل شارع طويل قد يمتد بعيداً عبر الحي بأكمله، فأخذ كل نقاطه كان يُنتج حدوداً واسعة جداً (وجد 492 شارعاً!).
+    // الحل: تمريرتان — أولاً نحسب مركزاً تقريبياً من كل النقاط، ثم نختار من كل شارع القطعة الأقرب فعلياً لهذا المركز
+    // (أي المنطقة التي تتقارب فيها الشوارع الأربعة فعلياً)، ونبني الحدود من هذه النقاط الأربع المُنقّحة فقط.
+    const allPts = pointSets.flat();
+    const roughLat = allPts.reduce((s,p) => s + p[0], 0) / allPts.length;
+    const roughLon = allPts.reduce((s,p) => s + p[1], 0) / allPts.length;
+    const refined = pointSets.map(pts => {
+      let best = pts[0], bestD = Infinity;
+      pts.forEach(p => {
+        const d = Math.hypot(p[0] - roughLat, p[1] - roughLon);
+        if (d < bestD) { bestD = d; best = p; }
+      });
+      return best;
+    });
+    const south = Math.min(...refined.map(p=>p[0])), north = Math.max(...refined.map(p=>p[0]));
+    const west  = Math.min(...refined.map(p=>p[1])), east  = Math.max(...refined.map(p=>p[1]));
+    const padLat = Math.max((north-south)*0.15, 0.0006);
+    const padLon = Math.max((east-west)*0.15, 0.0006);
+    const bbox = `${south-padLat},${west-padLon},${north+padLat},${east+padLon}`;
 
-    setSelection(bounds);
-    saveState();
-    setStatus('geocodeStatus', `✅ تم تحديد المربع باستخدام ${foundCount} من ${names.length} شوارع. يمكنك تعديل حدوده يدوياً على الخريطة بالسحب إن لزم.`, 'ok');
-  } catch (err) {
-    setStatus('geocodeStatus', '❌ حدث خطأ: ' + err.message, 'err');
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-// ===================== الطريقة الثالثة: تحديد شارع واحد فقط كمنطقة بحث =====================
-async function selectSingleStreet() {
-  const name = streetPickerSelections['stSingle'];
-  if (!name) { setStatus('singleStreetStatus', '⚠️ الرجاء اختيار الشارع من نتائج البحث (اضغط على الاسم من القائمة المقترحة)', 'err'); return; }
-
-  const btn = document.getElementById('singleStreetBtn');
-  btn.disabled = true;
-  setStatus('singleStreetStatus', '<span class="spinner"></span> جارٍ تحديد مسار الشارع بدقة...');
-
-  try {
-    const bbox = bboxStr(DISTRICT_BOUNDS);
-    const safeName = name.replace(/"/g, '\\"');
-    const q = `[out:json][timeout:20];
-      way["name"="${safeName}"]["highway"](${bbox});
+    const q = `[out:json][timeout:25];
+      way["highway"~"^(primary|secondary|tertiary|unclassified|residential|living_street)$"]["name"](${bbox});
       out geom;`;
-    const data = await overpassQuery(q, 18000);
-    let pts = [];
+    const data = await overpassQuery(q, 25000);
+
+    const boundarySet = new Set(names);
+    const internalMap = new Map();
+    const boundaryGeom = new Map();
     (data.elements || []).forEach(el => {
-      if (el.type === 'way' && el.geometry) el.geometry.forEach(g => pts.push([g.lat, g.lon]));
+      if (el.type !== 'way' || !el.tags || !el.tags.name || !el.geometry) return;
+      const coords = el.geometry.map(g => [g.lat, g.lon]);
+      const target = boundarySet.has(el.tags.name) ? boundaryGeom : internalMap;
+      const existing = target.get(el.tags.name);
+      if (!existing || coords.length > existing.length) target.set(el.tags.name, coords);
     });
-    if (!pts.length && streetGeometryMap.has(name)) pts = streetGeometryMap.get(name); // احتياط في حال فشل الاستعلام الدقيق
-    if (!pts.length) { setStatus('singleStreetStatus', '❌ تعذر تحديد موقع هذا الشارع بدقة، حاول مرة أخرى.', 'err'); btn.disabled = false; return; }
+    const list = Array.from(internalMap.keys()).sort((a,b) => a.localeCompare(b, 'ar'));
 
-    const south = Math.min(...pts.map(p=>p[0])), north = Math.max(...pts.map(p=>p[0]));
-    const west  = Math.min(...pts.map(p=>p[1])), east  = Math.max(...pts.map(p=>p[1]));
-    // هامش ضيق وثابت (نحو 35-40 متراً) على جانبي الشارع فقط، حتى تبقى منطقة البحث محصورة في هذا الشارع دون توسّع لمربع كامل
-    const padLat = 0.00035, padLon = 0.00045;
-    const bounds = L.latLngBounds([south - padLat, west - padLon], [north + padLat, east + padLon]);
-
-    setSelection(bounds);
+    lastResult = {
+      mode: 'four',
+      title: 'الشوارع الرئيسية داخل حدود الشوارع الأربعة',
+      items: list,
+      extra: {
+        boundary: names,
+        boundaryGeom: Array.from(boundaryGeom.entries()).map(([n, c]) => ({ name: n, coords: c })),
+        internal: Array.from(internalMap.entries()).map(([n, c]) => ({ name: n, coords: c }))
+      },
+      center: { lat: (south + north) / 2, lon: (west + east) / 2 },
+      district: currentDistrictName
+    };
+    renderFourResults(names, list);
+    setStatus('fourStatus', `✅ تم العثور على ${list.length} شارعاً رئيسياً داخل الحدود المحدَّدة.`, 'ok');
     saveState();
-    setStatus('singleStreetStatus', `✅ تم تحديد شارع "${name}" فقط كمنطقة بحث ضيقة على امتداده.`, 'ok');
   } catch (err) {
-    setStatus('singleStreetStatus', '❌ حدث خطأ: ' + err.message, 'err');
+    setStatus('fourStatus', '❌ حدث خطأ: ' + err.message, 'err');
   } finally {
     btn.disabled = false;
   }
 }
 
-// ===================== استخراج البيانات من Overpass =====================
-const SHOP_LABELS = {
-  supermarket:'سوبر ماركت', bakery:'مخبز', pharmacy:'صيدلية', clothes:'ملابس', mobile_phone:'موبايلات',
-  hairdresser:'صالون حلاقة', butcher:'جزارة', greengrocer:'خضار وفاكهة', convenience:'بقالة',
-  electronics:'إلكترونيات', furniture:'أثاث', hardware:'أدوات منزلية', stationery:'مكتبة', jewelry:'مجوهرات',
-  shoes:'أحذية', bicycle:'دراجات', car_repair:'ورشة سيارات', laundry:'مغسلة'
-};
-const AMENITY_LABELS = {
-  restaurant:'مطعم', cafe:'مقهى', pharmacy:'صيدلية', bank:'بنك', clinic:'عيادة', hospital:'مستشفى',
-  school:'مدرسة', marketplace:'سوق', fuel:'محطة وقود', atm:'صراف آلي',
-  fast_food:'وجبات سريعة', kindergarten:'حضانة', police:'شرطة', post_office:'بريد'
-};
-// أيقونات ولون نقطة لكل نوع، لتمييز المعالم البارزة (جوامع، كنائس...) عن باقي المحلات على الخريطة
-const CATEGORY_ICONS = {
-  'سوبر ماركت':'🛒','مخبز':'🥖','صيدلية':'💊','ملابس':'👕','موبايلات':'📱',
-  'صالون حلاقة':'💈','جزارة':'🥩','خضار وفاكهة':'🥬','بقالة':'🏪',
-  'إلكترونيات':'🔌','أثاث':'🛋️','أدوات منزلية':'🔧','مكتبة':'📚','مجوهرات':'💍',
-  'أحذية':'👟','دراجات':'🚲','ورشة سيارات':'🔧','مغسلة':'🧺',
-  'مطعم':'🍽️','مقهى':'☕','بنك':'🏦','عيادة':'🩺','مستشفى':'🏥',
-  'مدرسة':'🏫','سوق':'🏬','محطة وقود':'⛽','صراف آلي':'🏧',
-  'وجبات سريعة':'🍔','حضانة':'🧸','شرطة':'🚓','بريد':'✉️',
-  'جامع':'🕌','كنيسة':'⛪','دار عبادة':'🛐','منشأة':'📍'
-};
-const LANDMARK_CATEGORIES = new Set(['جامع','كنيسة','مدرسة','سوبر ماركت']);
-function categoryDotColor(category) {
-  if (['جامع','كنيسة','دار عبادة'].includes(category)) return '#c9a84c';
-  if (['مستشفى','عيادة','صيدلية'].includes(category)) return '#e53935';
-  if (['مدرسة','حضانة'].includes(category)) return '#8e44ad';
-  return '#1e88e5';
+function renderFourResults(boundary, list) {
+  const card = document.getElementById('fourResultsCard');
+  card.hidden = false;
+  document.getElementById('fourResultsCount').textContent = list.length;
+  const el = document.getElementById('fourResultsList');
+  el.innerHTML = list.length
+    ? list.map(n => `<span class="chip-item">🏘️ ${escHtml(n)}</span>`).join('')
+    : `<div class="empty-note">لم يتم العثور على شوارع رئيسية داخل هذه الحدود</div>`;
+  renderCenterLink('fourCenterLink');
 }
 
-function bboxStr(b) { return `${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()}`; }
-function polyStr(latlngs) { return latlngs.map(p => `${p.lat} ${p.lng}`).join(' '); }
-function overpassFilter() {
-  return selectedPolygonLatLngs ? `(poly:"${polyStr(selectedPolygonLatLngs)}")` : `(${bboxStr(selectedBounds)})`;
-}
-
-// ===================== قص خطوط الشوارع على حدود منطقة البحث (بهامش صغير ~5 أمتار) =====================
-// يمنع ظهور امتداد الشارع كاملاً خارج نطاق البحث (سلوك افتراضي في Overpass يُرجع الشارع بكامل طوله
-// إذا لامس المربع من نقطة واحدة فقط)، ويُبقي فقط الجزء الفعلي داخل أو قريب جداً من منطقة البحث.
-function pointInPolygon(lat, lon, poly) {
-  let inside = false;
-  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-    const yi = poly[i].lat, xi = poly[i].lng, yj = poly[j].lat, xj = poly[j].lng;
-    const intersect = ((xi > lon) !== (xj > lon)) && (lat < (yj - yi) * (lon - xi) / (xj - xi) + yi);
-    if (intersect) inside = !inside;
-  }
-  return inside;
-}
-
-function buildAreaInsideTest(marginMeters) {
-  const marginLat = marginMeters / 111320;
-  if (selectedPolygonLatLngs) {
-    const poly = selectedPolygonLatLngs;
-    return (lat, lon) => pointInPolygon(lat, lon, poly); // الرسم الحر: هامش المستخدم نفسه كافٍ عادة
-  }
-  const latMid = (selectedBounds.getSouth() + selectedBounds.getNorth()) / 2;
-  const marginLon = marginMeters / (111320 * Math.max(0.2, Math.cos(latMid * Math.PI / 180)));
-  const south = selectedBounds.getSouth() - marginLat, north = selectedBounds.getNorth() + marginLat;
-  const west = selectedBounds.getWest() - marginLon, east = selectedBounds.getEast() + marginLon;
-  return (lat, lon) => lat >= south && lat <= north && lon >= west && lon <= east;
-}
-
-// يقسّم سلسلة نقاط الشارع إلى أجزاء فرعية، مبقياً فقط النقاط المتصلة الواقعة داخل/قريباً من منطقة البحث
-function clipCoordsToArea(coords, insideTest) {
-  const segments = [];
-  let current = [];
-  for (let i = 0; i < coords.length; i++) {
-    const [lat, lon] = coords[i];
-    if (insideTest(lat, lon)) {
-      current.push([lat, lon]);
-    } else {
-      if (current.length > 1) segments.push(current);
-      current = [];
-    }
-  }
-  if (current.length > 1) segments.push(current);
-  return segments;
-}
-
-const OVERPASS_ENDPOINTS = [
-  'https://overpass-api.de/api/interpreter',
-  'https://overpass.kumi.systems/api/interpreter',
-  'https://overpass.openstreetmap.ru/api/interpreter'
-];
-
-async function overpassQueryOnce(q, timeoutMs) {
-  const body = 'data=' + encodeURIComponent(q);
-  const timeout = timeoutMs || 20000;
-  const attempts = OVERPASS_ENDPOINTS.map(url => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeout);
-    return fetch(url, { method: 'POST', body, signal: controller.signal })
-      .then(res => {
-        clearTimeout(timer);
-        if (!res.ok) throw new Error('bad status');
-        return res.json();
-      })
-      .catch(err => { clearTimeout(timer); throw err; });
-  });
-  // نرسل الطلب لعدة خوادم Overpass في آن واحد ونستخدم أسرع رد صحيح، مع مهلة زمنية لكل خادم حتى لا يتجمد التحميل بلا نتيجة
-  return Promise.any(attempts);
-}
-
-async function overpassQuery(q, timeoutMs) {
-  const delays = [1200, 2500]; // محاولتان إضافيتان بعد الأولى، بفاصل زمني متزايد
-  let lastErr;
-  for (let i = 0; i <= delays.length; i++) {
-    try {
-      return await overpassQueryOnce(q, timeoutMs);
-    } catch (err) {
-      lastErr = err;
-      if (i < delays.length) await new Promise(r => setTimeout(r, delays[i]));
-    }
-  }
-  throw new Error('تعذر الاتصال بخدمة استخراج البيانات بعد عدة محاولات — قد تكون خوادم الخرائط مزدحمة حالياً، حاول مرة أخرى بعد قليل');
-}
-
-async function fetchAreaData() {
-  if (!selectedBounds) return;
-  const btn = document.getElementById('fetchBtn');
-  btn.disabled = true;
-  setStatus('fetchStatus', '<span class="spinner"></span> جارٍ استخراج الشوارع والمحلات داخل المربع، قد يستغرق ذلك بضع ثوانٍ...');
-  streetsLayerGroup.clearLayers();
-  shopsLayerGroup.clearLayers();
-
-  const filter = overpassFilter();
-  const streetsQ = `[out:json][timeout:25];
-    way["highway"~"^(motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street|pedestrian|service)$"]["name"]${filter};
-    out geom;`;
-  const shopsQ = `[out:json][timeout:25];
-    (
-      node["shop"]${filter};
-      way["shop"]${filter};
-      node["amenity"~"^(restaurant|cafe|pharmacy|bank|clinic|hospital|school|place_of_worship|marketplace|fuel|atm|fast_food|kindergarten|police|post_office)$"]${filter};
-    );
-    out center tags;`;
-  const buildingsQ = `[out:json][timeout:25];
-    way["building"]${filter};
-    out tags center;`;
-
-  try {
-    const results = await Promise.allSettled([
-      overpassQuery(streetsQ), overpassQuery(shopsQ), overpassQuery(buildingsQ)
-    ]);
-    const [streetsRes, shopsRes, buildingsRes] = results;
-    if (streetsRes.status === 'rejected' && shopsRes.status === 'rejected') {
-      // فشل الاثنان الأساسيان معاً فقط هو ما يعتبر فشلاً كاملاً؛ أما فشل استعلام المباني وحده فلا يوقف باقي النتائج
-      throw streetsRes.reason || shopsRes.reason || new Error('تعذر الاتصال بالخدمة');
-    }
-    const streetsData = streetsRes.status === 'fulfilled' ? streetsRes.value : { elements: [] };
-    const shopsData = shopsRes.status === 'fulfilled' ? shopsRes.value : { elements: [] };
-    const buildingsData = buildingsRes.status === 'fulfilled' ? buildingsRes.value : { elements: [] };
-    const partialFailNote = [];
-    if (streetsRes.status === 'rejected') partialFailNote.push('الشوارع');
-    if (shopsRes.status === 'rejected') partialFailNote.push('المحلات');
-    if (buildingsRes.status === 'rejected') partialFailNote.push('تقدير الكثافة السكانية');
-
-    // معالجة الشوارع (مع قص كل شارع على حدود منطقة البحث + هامش صغير لا يتجاوز 5 أمتار)
-    const insideTest = buildAreaInsideTest(5);
-    const streetNames = new Map();
-    lastStreetSegments = [];
-    (streetsData.elements || []).forEach(el => {
-      if (el.type === 'way' && el.tags && el.tags.name && el.geometry) {
-        const rawCoords = el.geometry.map(g => [g.lat, g.lon]);
-        const clippedParts = clipCoordsToArea(rawCoords, insideTest);
-        if (!clippedParts.length) return; // الشارع لامس المنطقة بنقطة بعيدة فقط، لا جزء فعلي منه داخل النطاق
-        clippedParts.forEach(coords => {
-          if (!streetNames.has(el.tags.name)) streetNames.set(el.tags.name, []);
-          streetNames.get(el.tags.name).push(coords);
-          lastStreetSegments.push({ name: el.tags.name, coords });
-          drawStreetSegment(coords);
-        });
-      }
-    });
-    lastStreets = Array.from(streetNames.keys()).sort();
-    addStreetLabels(streetNames); // إضافة ملصق اسم على كل شارع مستخرج ليظهر مباشرة عند تكبير الخريطة
-
-    // معالجة المحلات والمعالم (تمييز الجوامع عن الكنائس حسب الديانة)
-    const shops = [];
-    (shopsData.elements || []).forEach(el => {
-      const tags = el.tags || {};
-      const lat = el.lat ?? el.center?.lat, lon = el.lon ?? el.center?.lon;
-      if (lat == null || lon == null) return;
-      const name = tags.name || null;
-      let category = null;
-      if (tags.shop) {
-        category = SHOP_LABELS[tags.shop] || tags.shop;
-      } else if (tags.amenity === 'place_of_worship') {
-        if (tags.religion === 'muslim') category = 'جامع';
-        else if (tags.religion === 'christian') category = 'كنيسة';
-        else category = 'دار عبادة';
-      } else if (tags.amenity) {
-        category = AMENITY_LABELS[tags.amenity] || tags.amenity;
-      }
-      if (!name && !category) return;
-      shops.push({ name: name || 'بدون اسم', category: category || 'منشأة', lat, lon });
-    });
-    lastShops = shops;
-    drawAllShopMarkers(shops); // يرسم كل المحلات، مع تحديد عدد ملصقات المعالم البارزة الظاهرة لتفادي الازدحام
-
-
-    // تقدير الكثافة السكانية من عدد المباني السكنية وارتفاعها (تقدير تقريبي وليس إحصاءً رسمياً)
-    lastDensity = computeDensityEstimate(buildingsData, selectedPolygonLatLngs || null, selectedBounds);
-
-    renderResults();
-    const partialNote = partialFailNote.length ? ` (تعذر تحميل: ${partialFailNote.join('، ')} — يمكنك الضغط على استخراج مرة أخرى)` : '';
-    setStatus('fetchStatus', `✅ تم العثور على ${lastStreets.length} شارع و ${lastShops.length} محل/منشأة داخل المربع.${partialNote}`, partialFailNote.length ? 'err' : 'ok');
-    document.getElementById('topbar-status').textContent = `${lastStreets.length} شارع • ${lastShops.length} محل ومنشأة`;
-    saveState();
-  } catch (err) {
-    setStatus('fetchStatus', '❌ حدث خطأ: ' + err.message + ' — حاول مرة أخرى أو صغّر حجم المربع.', 'err');
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-function drawStreetSegment(coords) {
-  L.polyline(coords, { color:'#e53935', weight:4, opacity:0.85 }).addTo(streetsLayerGroup);
-}
-
-// ===================== تقدير الكثافة السكانية (تقريبي من بيانات OpenStreetMap) =====================
-const RESIDENTIAL_BUILDING_TYPES = new Set(['residential','apartments','house','terrace','detached','semidetached_house','bungalow','dormitory']);
-const SINGLE_UNIT_TYPES = new Set(['house','detached','semidetached_house','bungalow']);
-const ASSUMED_UNITS_PER_FLOOR = 2;   // افتراض شائع لعدد الوحدات بكل دور في مبنى سكني عادي
-const ASSUMED_DEFAULT_FLOORS = 4;    // افتراض لعدد الأدوار إذا لم يكن مذكوراً في البيانات
-const ASSUMED_HOUSEHOLD_SIZE = 4;    // متوسط تقريبي لحجم الأسرة المصرية
-
-function boundsAreaKm2(bounds) {
-  const south = bounds.getSouth(), north = bounds.getNorth(), west = bounds.getWest(), east = bounds.getEast();
-  const R = 6371;
-  const latMid = (south + north) / 2 * Math.PI / 180;
-  const height = R * (north - south) * Math.PI / 180;
-  const width = R * (east - west) * Math.PI / 180 * Math.cos(latMid);
-  return Math.abs(width * height);
-}
-function polygonAreaKm2(latlngs) {
-  const R = 6371;
-  const rad = d => d * Math.PI / 180;
-  const latMid = latlngs.reduce((s, p) => s + p.lat, 0) / latlngs.length;
-  const pts = latlngs.map(p => [R * rad(p.lng) * Math.cos(rad(latMid)), R * rad(p.lat)]);
-  let area = 0;
-  for (let i = 0; i < pts.length; i++) {
-    const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % pts.length];
-    area += x1 * y2 - x2 * y1;
-  }
-  return Math.abs(area / 2);
-}
-
-function estimateUnitsForBuilding(tags) {
-  if (tags['building:flats']) {
-    const n = parseInt(tags['building:flats'], 10);
-    if (n > 0) return n;
-  }
-  if (SINGLE_UNIT_TYPES.has(tags.building)) return 1;
-  const levels = parseFloat(tags['building:levels']);
-  const floors = (levels && levels > 0) ? levels : ASSUMED_DEFAULT_FLOORS;
-  return Math.max(1, Math.round(floors * ASSUMED_UNITS_PER_FLOOR));
-}
-
-function computeDensityEstimate(buildingsData, polygonLatLngs, bounds) {
-  const elements = buildingsData?.elements || [];
-  let buildingCount = 0, totalUnits = 0, usedDefaultFloors = 0, usedFallbackYes = false;
-
-  const countPass = (predicate) => {
-    let count = 0, units = 0, defaults = 0;
-    elements.forEach(el => {
-      const tags = el.tags || {};
-      if (!predicate(tags)) return;
-      count++;
-      if (!tags['building:levels'] && !tags['building:flats']) defaults++;
-      units += estimateUnitsForBuilding(tags);
-    });
-    return { count, units, defaults };
-  };
-
-  // المحاولة الأولى: مبانٍ مصنّفة صراحة كسكنية
-  let pass = countPass(tags => RESIDENTIAL_BUILDING_TYPES.has(tags.building));
-  buildingCount = pass.count; totalUnits = pass.units; usedDefaultFloors = pass.defaults;
-
-  // إذا لم توجد مبانٍ مصنّفة (شائع في بيانات OSM لبعض المناطق)، نحسب تقديراً أوسع من كل مبنى غير مصنّف (building=yes)
-  // باستثناء ما هو معروف أنه محل/منشأة تجارية بحتة، كتقدير احتياطي أقل دقة
-  if (buildingCount === 0) {
-    pass = countPass(tags => tags.building === 'yes' && !tags.shop && tags.amenity !== 'place_of_worship');
-    buildingCount = pass.count; totalUnits = pass.units; usedDefaultFloors = pass.defaults;
-    usedFallbackYes = buildingCount > 0;
-  }
-
-  const population = totalUnits * ASSUMED_HOUSEHOLD_SIZE;
-  const areaKm2 = polygonLatLngs ? polygonAreaKm2(polygonLatLngs) : boundsAreaKm2(bounds);
-  const density = areaKm2 > 0 ? population / areaKm2 : 0;
-  return {
-    buildingCount, totalUnits, population,
-    areaKm2: Math.round(areaKm2 * 1000) / 1000,
-    density: Math.round(density),
-    usedDefaultFloors, usedFallbackYes
-  };
-}
-
-// يضع ملصق اسم واحد لكل شارع فريد عند أطول قطعة منه، ليظهر اسم الشارع مباشرة على الخريطة عند التكبير
-const MAX_STREET_LABELS_ON_MAP = 6; // تفادي تكدّس الأسماء فوق بعضها عند وجود عدد كبير من الشوارع
-
-function addStreetLabels(streetNamesMap) {
-  // نحسب أطول قطعة لكل شارع، ثم نعرض الاسم فقط لأطول عدد محدود من الشوارع (الأكثر أهمية غالباً)
-  const withLength = [];
-  streetNamesMap.forEach((segments, name) => {
-    let longest = segments[0];
-    segments.forEach(seg => { if (seg.length > longest.length) longest = seg; });
-    if (!longest || !longest.length) return;
-    let lenMeters = 0;
-    for (let i = 1; i < longest.length; i++) {
-      lenMeters += map.distance(longest[i - 1], longest[i]);
-    }
-    withLength.push({ name, mid: longest[Math.floor(longest.length / 2)], lenMeters });
-  });
-  withLength.sort((a, b) => b.lenMeters - a.lenMeters);
-  withLength.slice(0, MAX_STREET_LABELS_ON_MAP).forEach(s => drawStreetLabel(s.name, s.mid));
-}
-function drawStreetLabel(name, midpoint) {
-  const icon = L.divIcon({
-    className: '',
-    html: `<div style="background:rgba(180,30,30,0.92);color:#fff;font-size:10px;font-weight:800;padding:2px 9px;border-radius:10px;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,0.5);border:1px solid #fff;transform:translate(-50%,-50%);">${escHtml(name)}</div>`,
-    iconSize: null
-  });
-  L.marker(midpoint, { icon, interactive: false }).addTo(streetsLayerGroup);
-}
-
-// يعرض كل محل/معلم كأيقونة + اسم ظاهرين مباشرة على الخريطة (بدون الحاجة للضغط)، بلون مميز للمعالم البارزة
-const MAX_LANDMARK_LABELS_ON_MAP = 6;   // إجمالي أقصى عدد ملصقات معالم ظاهرة على الخريطة
-const MAX_LABELS_PER_CATEGORY = 2;      // حد أقصى لكل نوع (جامع/كنيسة/مدرسة/سوبر ماركت) لضمان تنوّع لا تكرار فئة واحدة
-
-// يرسم كل المحلات، لكنه يمنح ملصق اسم دائم فقط لعدد محدود من أهم المعالم (بحد أقصى لكل فئة)؛
-// الباقي (وكل المحلات العادية) تظهر كنقطة صغيرة يظهر اسمها بالضغط عليها فقط، لتفادي ازدحام الخريطة والطباعة
-function drawAllShopMarkers(shops) {
-  const categoryCount = {};
-  let landmarkLabelTotal = 0;
-  shops.forEach(shop => {
-    let showLabel = false;
-    if (LANDMARK_CATEGORIES.has(shop.category)) {
-      const catCount = categoryCount[shop.category] || 0;
-      if (landmarkLabelTotal < MAX_LANDMARK_LABELS_ON_MAP && catCount < MAX_LABELS_PER_CATEGORY) {
-        showLabel = true;
-        categoryCount[shop.category] = catCount + 1;
-        landmarkLabelTotal++;
-      }
-    }
-    drawShopMarker(shop, showLabel);
-  });
-}
-
-function drawShopMarker(shop, showLabel) {
-  const icon = CATEGORY_ICONS[shop.category] || '📍';
-  const dotColor = categoryDotColor(shop.category);
-
-  if (showLabel) {
-    // المعالم البارزة المختارة (بحد أقصى لكل فئة) تظهر باسمها دائماً لتقليل الحاجة للضغط عليها
-    const divIcon = L.divIcon({
-      className: '',
-      html: `<div style="position:relative;display:flex;align-items:center;gap:4px;transform:translate(-6px,-6px);">
-        <span style="width:11px;height:11px;border-radius:50%;background:${dotColor};border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.5);flex-shrink:0;"></span>
-        <span style="background:rgba(15,34,51,0.95);color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:10px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.4);border:1px solid ${dotColor};">${icon} ${escHtml(shop.name)}</span>
-      </div>`,
-      iconSize: null
-    });
-    L.marker([shop.lat, shop.lon], { icon: divIcon, interactive: true })
-      .bindPopup(`<b>${escHtml(shop.name)}</b><br>${escHtml(shop.category)}`)
-      .addTo(shopsLayerGroup);
+function renderCenterLink(elId) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (lastResult && lastResult.center) {
+    const { lat, lon } = lastResult.center;
+    el.innerHTML = `<a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" style="display:block;text-align:center;color:#7ea8ff;font-weight:700;font-size:13px;text-decoration:none;background:rgba(126,168,255,0.1);border:1px solid #7ea8ff;border-radius:10px;padding:10px;">🗺️ فتح مركز الموقع في خرائط جوجل</a>`;
   } else {
-    // كل الباقي: نقطة صغيرة فقط لتقليل الازدحام البصري، والاسم يظهر بالضغط عليها
-    L.circleMarker([shop.lat, shop.lon], { radius: 5, color: dotColor, fillColor: dotColor, fillOpacity: 0.9, weight: 1.5 })
-      .bindPopup(`<b>${icon} ${escHtml(shop.name)}</b><br>${escHtml(shop.category)}`)
-      .addTo(shopsLayerGroup);
+    el.innerHTML = '';
   }
 }
 
-function renderResults() {
-  document.getElementById('resultsCard').hidden = false;
-  document.getElementById('streetsCount').textContent = lastStreets.length;
-  document.getElementById('shopsCount').textContent = lastShops.length;
-
-  const sEl = document.getElementById('streetsList');
-  sEl.innerHTML = lastStreets.length
-    ? lastStreets.map(n => `<span class="chip-item">🚧 ${escHtml(n)}</span>`).join('')
-    : `<div class="empty-note">لم يتم العثور على شوارع مسماة داخل هذا المربع</div>`;
-
-  const shEl = document.getElementById('shopsList');
-  if (!lastShops.length) {
-    shEl.innerHTML = `<div class="empty-note">لم يتم العثور على محلات أو منشآت داخل هذا المربع</div>`;
-  } else {
-    // ترتيب: التي لها اسم أولاً
-    const sorted = [...lastShops].sort((a,b) => (a.name==='بدون اسم') - (b.name==='بدون اسم'));
-    shEl.innerHTML = sorted.slice(0, 80).map(s =>
-      `<div class="shop-item"><span>${escHtml(s.name)}</span><span class="cat">${escHtml(s.category)}</span></div>`
-    ).join('') + (sorted.length > 80 ? `<div class="empty-note">+ ${sorted.length-80} منشأة أخرى (تظهر جميعها في تقرير PDF)</div>` : '');
-  }
-
-  const dEl = document.getElementById('densityBox');
-  if (dEl) {
-    if (!lastDensity || !lastDensity.buildingCount) {
-      dEl.innerHTML = `لم يتم العثور على مبانٍ سكنية مسجلة داخل هذا المربع في بيانات الخريطة.`;
-    } else {
-      const d = lastDensity;
-      dEl.innerHTML = `
-        🏢 عدد المباني ${d.usedFallbackYes ? '(غير مصنّفة تفصيلاً)' : 'السكنية'} المكتشفة: <strong>${d.buildingCount}</strong><br>
-        🏠 إجمالي الوحدات السكنية التقديرية: <strong>${d.totalUnits.toLocaleString('ar-EG')}</strong><br>
-        👥 عدد السكان التقديري: <strong>${d.population.toLocaleString('ar-EG')}</strong> نسمة<br>
-        📐 مساحة المنطقة: <strong>${d.areaKm2}</strong> كم²<br>
-        📊 الكثافة السكانية التقديرية: <strong>${d.density.toLocaleString('ar-EG')}</strong> نسمة/كم²
-        ${d.usedFallbackYes ? '<br><span style="color:#e0a030">⚠️ لم توجد مبانٍ مصنّفة كسكنية بدقة في بيانات الخريطة، فتم الاحتساب من كل المباني الموجودة كتقدير أوسع.</span>' : ''}
-      `;
-    }
-  }
-
-  document.getElementById('resultsCard').scrollIntoView({ behavior:'smooth', block:'start' });
+// ===================== اسم الباحث + مقاس الطباعة =====================
+function onResearcherNameChange() { researcherName = document.getElementById('researcherName').value.trim(); saveState(); }
+function onDatesChange() {
+  searchDate = document.getElementById('searchDate').value;
+  convoyDate = document.getElementById('convoyDate').value;
+  saveState();
+}
+function formatDateAr(isoDate) {
+  if (!isoDate) return '';
+  const [y,m,d] = isoDate.split('-');
+  return `${d}/${m}/${y}`;
+}
+function setPaperSize(size) {
+  paperSize = size;
+  document.getElementById('sizeA3').classList.toggle('selected', size === 'a3');
+  document.getElementById('sizeA4').classList.toggle('selected', size === 'a4');
+  saveState();
 }
 
-// ===================== تصدير PDF =====================
+// ===================== تصدير PDF (تقرير نصي فقط، بلا خريطة) =====================
 async function exportPDF() {
-  if (!selectedBounds) return;
+  if (!lastResult) { alert('لا توجد نتيجة بعد — قم بالبحث أولاً في أحد التبويبين.'); return; }
   const btn = document.getElementById('pdfBtn');
   const original = btn.textContent;
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> جارٍ تجهيز ملف PDF...';
 
   try {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('l', 'pt', paperSize); // صفحة الخريطة أفقية
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
+    btn.innerHTML = '<span class="spinner"></span> جارٍ التقاط صورة الموقع الحقيقية...';
+    const mapImgDataUrl = await captureRealMapImage(lastResult);
 
-    // --- صفحة 1: الخريطة المكبرة ---
-    map.closePopup();
-    // قبل الالتقاط: نحفظ العرض الحالي، ثم نقرّب الخريطة بإحكام على منطقة البحث فقط
-    // لضمان خريطة واضحة ومكبرة تملأ صفحة الطباعة بالكامل، ثم نعيد العرض كما كان بعد الالتقاط
-    const printOriginalCenter = map.getCenter();
-    const printOriginalZoom = map.getZoom();
-    const printBounds = selectedPolygonLatLngs ? L.polygon(selectedPolygonLatLngs).getBounds() : selectedBounds;
-    map.fitBounds(printBounds.pad(0.04), { maxZoom: 20, animate: false });
-    map.invalidateSize();
-    await new Promise(r => setTimeout(r, 500)); // انتظار تحميل بلاطات الزووم الجديد
-
-    // شريط عنوان مؤقت يُضاف داخل الخريطة قبل الالتقاط لضمان ظهور النص العربي بشكل صحيح
-    // (النص العربي عبر pdf.text() في jsPDF لا يُعرض بشكل سليم، لذلك نلتقطه كصورة HTML بدلاً من ذلك)
-    const mapDiv = document.getElementById('map');
-    const subLine = researcherName
-      ? `${new Date().toLocaleDateString('ar-EG')} — الباحث: ${escHtml(researcherName)} — سفراء الخير`
-      : `${new Date().toLocaleDateString('ar-EG')} — سفراء الخير`;
-    const titleBar = document.createElement('div');
-    titleBar.style.cssText = 'position:absolute;top:0;left:0;right:0;z-index:9999;background:#ffffff;padding:10px 16px 8px;text-align:center;border-bottom:3px solid #c9a84c;font-family:"Segoe UI",Tahoma,Arial,sans-serif;direction:rtl;';
-    titleBar.innerHTML = `<div style="font-size:19px;font-weight:800;color:#0f2233;">خريطة مكبرة للمربع السكني - حي المنتزة أول، الإسكندرية</div><div style="font-size:12px;color:#5a7a8a;margin-top:3px;">${subLine}</div>`;
-    mapDiv.appendChild(titleBar);
-    await new Promise(r => setTimeout(r, 120));
-
-    const mapCanvas = await html2canvas(mapDiv, { useCORS: true, scale: 2, backgroundColor: '#ffffff' });
-    mapDiv.removeChild(titleBar);
-    // إعادة الخريطة إلى العرض الذي كان عليه المستخدم قبل التصدير
-    map.setView(printOriginalCenter, printOriginalZoom, { animate: false });
-
-    const margin = 24;
-    const availW = pageW - margin*2, availH = pageH - margin*2;
-    const ratio = Math.min(availW / mapCanvas.width, availH / mapCanvas.height);
-    const imgW = mapCanvas.width * ratio, imgH = mapCanvas.height * ratio;
-    const imgX = (pageW - imgW)/2, imgY = (pageH - imgH)/2;
-    pdf.setDrawColor(201,168,76); pdf.setLineWidth(1.5);
-    pdf.rect(imgX-2, imgY-2, imgW+4, imgH+4);
-    pdf.addImage(mapCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', imgX, imgY, imgW, imgH);
-
-    // --- صفحة 2+: البيان (الشوارع والمحلات) كصورة لضمان ظهور النص العربي بشكل صحيح ---
-    buildReportHTML();
+    btn.innerHTML = '<span class="spinner"></span> جارٍ تجهيز ملف PDF...';
+    buildReportHTML(mapImgDataUrl);
     const reportEl = document.getElementById('report-render');
     const reportCanvas = await html2canvas(reportEl, { scale: 2, backgroundColor: '#ffffff' });
 
-    pdf.addPage(paperSize, 'p');
-    const pPageW = pdf.internal.pageSize.getWidth();
-    const pPageH = pdf.internal.pageSize.getHeight();
-    const pMargin = 20;
-    const pAvailW = pPageW - pMargin*2;
-    const pxToPt = pAvailW / reportCanvas.width;
-    const sliceHeightPx = Math.floor((pPageH - pMargin*2) / pxToPt);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'pt', paperSize);
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const margin = 20;
+    const availW = pageW - margin*2;
+    const pxToPt = availW / reportCanvas.width;
+    const sliceHeightPx = Math.floor((pageH - margin*2) / pxToPt);
 
     let renderedPx = 0, first = true;
     while (renderedPx < reportCanvas.height) {
@@ -1300,11 +711,25 @@ async function exportPDF() {
       sliceCanvas.width = reportCanvas.width; sliceCanvas.height = sliceH;
       sliceCanvas.getContext('2d').drawImage(reportCanvas, 0, renderedPx, reportCanvas.width, sliceH, 0, 0, reportCanvas.width, sliceH);
       if (!first) pdf.addPage(paperSize, 'p');
-      pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', pMargin, pMargin, pAvailW, sliceH * pxToPt);
+      pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', margin, margin, availW, sliceH * pxToPt);
       renderedPx += sliceH; first = false;
     }
 
-    pdf.save('خريطة_وبيان_المربع_السكني.pdf');
+    // رابط حي وقابل للضغط فعلياً (وليس مجرد نص داخل صورة مسطّحة، فالنصوص داخل الصور لا تُفتح أبداً)
+    // نضيفه كصفحة أخيرة بنص إنجليزي/رقمي صِرف (روابط جوجل لا تحتاج خطاً عربياً، فتُعرض بشكل سليم مباشرة عبر jsPDF)
+    if (lastResult.center) {
+      const { lat, lon } = lastResult.center;
+      const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+      pdf.addPage(paperSize, 'p');
+      pdf.setFontSize(16); pdf.setTextColor(15,34,51);
+      pdf.text('Open Search Center on Google Maps:', margin, 60);
+      pdf.setFontSize(13); pdf.setTextColor(30,110,184);
+      pdf.textWithLink(mapLink, margin, 90, { url: mapLink });
+      pdf.setDrawColor(30,110,184); pdf.setLineWidth(1);
+      pdf.line(margin, 94, margin + pdf.getTextWidth(mapLink), 94);
+    }
+
+    pdf.save('دليل_الباحث.pdf');
   } catch (err) {
     alert('حدث خطأ أثناء إنشاء ملف PDF: ' + err.message);
   } finally {
@@ -1312,77 +737,159 @@ async function exportPDF() {
   }
 }
 
-function buildReportHTML() {
+// ===================== لقطة شاشة حقيقية للخريطة (بدل الرسم التخطيطي) لتقرير PDF فقط =====================
+// خريطة مخفية تماماً عن واجهة التطبيق، تُستخدم فقط لالتقاط صورة حقيقية للموقع مع تلوين الشوارع المسجلة فقط
+// ملاحظة مهمة: html2canvas لا يتعامل بشكل صحيح مع تموضع Leaflet ثلاثي الأبعاد (translate3d) المُسرَّع بالعتاد،
+// ما كان يجعل خطوط الشوارع الملوّنة تُرسم في مكان خاطئ تماماً (فتبدو غائبة). نعطّل هذا التسريع لضمان التقاط صحيح.
+L.Browser.any3d = false;
+
+let pdfMap = null;
+let pdfMapLayer = null;
+let pdfTileLayer = null;
+
+function ensurePdfMap() {
+  if (pdfMap) return pdfMap;
+  pdfMap = L.map('pdf-map', { zoomControl: false, attributionControl: false, fadeAnimation: false });
+  pdfTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    maxZoom: 20, crossOrigin: true
+  }).addTo(pdfMap);
+  return pdfMap;
+}
+
+function collectMapSegments(r) {
+  const segments = [];
+  if (r.mode === 'single') {
+    if (r.extra.targetCoords && r.extra.targetCoords.length > 1) {
+      segments.push({ coords: r.extra.targetCoords, color: '#a07830', weight: 6, main: true });
+    }
+    (r.extra.connected || []).forEach(c => {
+      if (c.coords && c.coords.length > 1) segments.push({ coords: c.coords, color: '#e53935', weight: 4, main: false });
+    });
+  } else {
+    (r.extra.boundaryGeom || []).forEach(b => {
+      if (b.coords && b.coords.length > 1) segments.push({ coords: b.coords, color: '#a07830', weight: 6, main: true });
+    });
+    (r.extra.internal || []).forEach(i => {
+      if (i.coords && i.coords.length > 1) segments.push({ coords: i.coords, color: '#e53935', weight: 4, main: false });
+    });
+  }
+  return segments;
+}
+
+// ننتظر حتى يُطلق حدث "load" الحقيقي لطبقة البلاطات (كل البلاطات المرئية انتهت من التحميل فعلاً)
+// بدل تخمين مدة انتظار ثابتة، والتي كانت تسبب ظهور مربعات رمادية لبلاطات لم تكتمل بعد
+function waitForTilesLoaded(tileLayer, maxWaitMs) {
+  return new Promise(resolve => {
+    let done = false;
+    const finish = () => { if (!done) { done = true; resolve(); } };
+    if (tileLayer._loading === false) { /* قد تكون محمّلة مسبقاً */ }
+    tileLayer.once('load', finish);
+    setTimeout(finish, maxWaitMs || 6000); // حد أقصى احتياطي فقط
+  });
+}
+
+async function captureRealMapImage(r) {
+  const segments = collectMapSegments(r);
+  if (!segments.length) return null;
+
+  const map = ensurePdfMap();
+  // لا نضيف أي طبقة Leaflet متجهة هذه المرة — التقاط طبقات Leaflet الشعاعية عبر html2canvas أثبت عدم موثوقيته
+  // (الخطوط كانت تُرسم في مكان غير صحيح رغم تعطيل التسريع ثلاثي الأبعاد). سنرسم الخطوط بأنفسنا مباشرة فوق
+  // الصورة الملتقطة، باستخدام تحويل إحداثيات Leaflet نفسه (دقيق ومضمون 100% لأنه حساب رياضي فقط، لا رسم).
+
+  // نحسب حدود التكبير من الشارع الرئيسي/شوارع الحدود فقط، وليس الطول الكامل للشوارع المتفرعة/الداخلية
+  const mainSegs = segments.filter(s => s.main);
+  const boundsSource = (mainSegs.length ? mainSegs : segments).flatMap(s => s.coords).map(c => L.latLng(c[0], c[1]));
+  const bounds = L.latLngBounds(boundsSource);
+
+  map.invalidateSize();
+  const tilesLoadedPromise = waitForTilesLoaded(pdfTileLayer, 6000);
+  map.fitBounds(bounds.pad(0.12), { animate: false, maxZoom: 19 });
+  await tilesLoadedPromise;
+  await new Promise(res => setTimeout(res, 250));
+
+  // 1) التقاط بلاطات الخريطة فقط (بدون أي عنصر متجه من Leaflet)
+  const baseCanvas = await html2canvas(document.getElementById('pdf-map'), { useCORS: true, scale: 2, backgroundColor: '#ffffff' });
+
+  // 2) رسم الشوارع الملوّنة يدوياً فوق الصورة الملتقطة، بتحويل كل نقطة إلى بكسل داخل حاوية الخريطة عبر Leaflet مباشرة
+  const ctx = baseCanvas.getContext('2d');
+  const mapSize = map.getSize();
+  const scaleFactor = baseCanvas.width / mapSize.x; // يطابق scale:2 المستخدم أعلاه تلقائياً مهما تغيّر
+  segments.forEach(seg => {
+    if (seg.coords.length < 2) return;
+    ctx.beginPath();
+    seg.coords.forEach((c, idx) => {
+      const pt = map.latLngToContainerPoint(L.latLng(c[0], c[1]));
+      const x = pt.x * scaleFactor, y = pt.y * scaleFactor;
+      if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = seg.color;
+    ctx.lineWidth = seg.weight * scaleFactor;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.globalAlpha = 0.95;
+    ctx.stroke();
+  });
+  ctx.globalAlpha = 1;
+
+  return baseCanvas.toDataURL('image/jpeg', 0.9);
+}
+
+function buildReportHTML(mapImgDataUrl) {
   const el = document.getElementById('report-render');
-  const dateStr = new Date().toLocaleDateString('ar-EG');
-  let streetsHtml = lastStreets.length
-    ? `<div class="grid-tags">${lastStreets.map(n => `<span class="tag">${escHtml(n)}</span>`).join('')}</div>`
-    : `<p style="color:#888">لا توجد شوارع مسماة داخل هذا المربع.</p>`;
+  const r = lastResult;
+  const itemsHtml = r.items.length
+    ? `<div class="grid-tags">${r.items.map(n => `<span class="tag">${escHtml(n)}</span>`).join('')}</div>`
+    : `<p style="color:#888">لا توجد نتائج.</p>`;
 
-  let shopsHtml;
-  if (!lastShops.length) {
-    shopsHtml = `<p style="color:#888">لا توجد محلات أو منشآت مسجلة داخل هذا المربع.</p>`;
+  let contextLine = '';
+  if (r.mode === 'single') {
+    contextLine = `الشارع المحدد: ${escHtml(r.extra.streetName)}`;
   } else {
-    const sorted = [...lastShops].sort((a,b) => a.category.localeCompare(b.category,'ar'));
-    shopsHtml = `<table><thead><tr><th>الاسم</th><th>النوع</th></tr></thead><tbody>`
-      + sorted.map(s => `<tr><td>${escHtml(s.name)}</td><td>${escHtml(s.category)}</td></tr>`).join('')
-      + `</tbody></table>`;
+    contextLine = `حدود المنطقة: ${r.extra.boundary.map(escHtml).join(' — ')}`;
   }
 
-  let densityHtml;
-  if (!lastDensity || !lastDensity.buildingCount) {
-    densityHtml = `<p style="color:#888">لم يتم العثور على مبانٍ سكنية مسجلة داخل هذا المربع في بيانات الخريطة.</p>`;
-  } else {
-    const d = lastDensity;
-    densityHtml = `<table><tbody>
-      <tr><td>عدد المباني السكنية المكتشفة</td><td>${d.buildingCount}</td></tr>
-      <tr><td>إجمالي الوحدات السكنية التقديرية</td><td>${d.totalUnits.toLocaleString('ar-EG')}</td></tr>
-      <tr><td>عدد السكان التقديري</td><td>${d.population.toLocaleString('ar-EG')} نسمة</td></tr>
-      <tr><td>مساحة المنطقة</td><td>${d.areaKm2} كم²</td></tr>
-      <tr><td>الكثافة السكانية التقديرية</td><td>${d.density.toLocaleString('ar-EG')} نسمة/كم²</td></tr>
-    </tbody></table>
-    <p style="color:#888;font-size:11px;margin-top:6px">⚠️ تقدير تقريبي بناءً على بيانات OpenStreetMap وافتراضات متوسطة (${ASSUMED_UNITS_PER_FLOOR} وحدة/دور، ${ASSUMED_HOUSEHOLD_SIZE} أفراد/أسرة تقريباً)، وليس إحصاءً رسمياً.${d.usedFallbackYes ? ' لم توجد مبانٍ مصنّفة كسكنية بدقة في بيانات الخريطة، فتم الاحتساب من كل المباني الموجودة كتقدير أوسع.' : ''}</p>`;
-  }
+  const bigLineStyle = 'font-size:48px;font-weight:800;color:#0f2233;line-height:1.5;';
+  const infoBlockHtml = `
+    <div style="${bigLineStyle}">📅 تاريخ البحث: ${escHtml(formatDateAr(searchDate) || '—')}</div>
+    <div style="${bigLineStyle}">🚐 تاريخ القافلة: ${escHtml(formatDateAr(convoyDate) || '—')}</div>
+    ${researcherName ? `<div style="${bigLineStyle}">🖊️ الباحث: ${escHtml(researcherName)}</div>` : ''}
+  `;
 
   el.innerHTML = `
-    <h1>بيان المربع السكني</h1>
-    <div class="sub">حي المنتزة أول - الإسكندرية | تاريخ الإصدار: ${dateStr} — سفراء الخير</div>
-    ${researcherName ? `<div style="background:#f4ead0;border:1px solid #dcc27a;border-radius:10px;padding:8px 14px;margin-bottom:14px;font-size:13px;color:#5a4210;font-weight:700;">🖊️ اسم الباحث: ${escHtml(researcherName)}</div>` : ''}
-    <h2>🚧 أهم الشوارع داخل المربع (${lastStreets.length})</h2>
-    ${streetsHtml}
-    <h2>🏪 أهم المحلات والمنشآت داخل المربع (${lastShops.length})</h2>
-    ${shopsHtml}
-    <h2>👥 الكثافة السكانية التقديرية</h2>
-    ${densityHtml}
+    <div style="display:flex;align-items:center;gap:12px;border-bottom:3px solid #c9a84c;padding-bottom:10px;margin-bottom:14px;">
+      <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#c9a84c,#e8c86a);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🛣️</div>
+      <div>
+        <h1 style="border:none;padding:0;margin:0;">دليل الباحث - ${escHtml(r.district || currentDistrictName || '')}، الإسكندرية</h1>
+      </div>
+    </div>
+    ${infoBlockHtml}
+    <div style="background:#f4ead0;border:1px solid #dcc27a;border-radius:10px;padding:12px 14px;margin:14px 0;font-size:39px;color:#5a4210;font-weight:800;">${contextLine}</div>
+    ${mapImgDataUrl ? `<h2>🗺️ صورة الموقع الحقيقية (الشوارع المسجلة ملوّنة)</h2><img src="${mapImgDataUrl}" style="width:100%;display:block;border-radius:10px;border:2px solid #c9a84c;"/>` : ''}
+    <h2>${escHtml(r.title)} (${r.items.length})</h2>
+    ${itemsHtml}
+    <p style="font-size:11px;color:#999;margin-top:16px;">🔗 رابط مركز الموقع القابل للضغط موجود في الصفحة الأخيرة من هذا الملف.</p>
   `;
 }
 
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function escAttr(s) { return escHtml(s); }
-
-// ===================== حفظ واسترجاع الشاشة تلقائياً (بدون الحاجة لأي إجراء يدوي) =====================
-const STATE_KEY = 'montaza_map_state_v1';
+// ===================== حفظ واسترجاع الشاشة تلقائياً =====================
+const STATE_KEY = 'alex_streets_tool_state_v1';
 
 function currentActiveTab() {
-  if (document.getElementById('panel-streets').classList.contains('active')) return 'streets';
-  if (document.getElementById('panel-single').classList.contains('active')) return 'single';
-  return 'draw';
+  return document.getElementById('panel-four').classList.contains('active') ? 'four' : 'single';
 }
 
 function saveState() {
   try {
     const state = {
-      researcherName,
-      paperSize,
+      researcherName, paperSize, districtName: currentDistrictName,
+      searchDate, convoyDate,
       activeTab: currentActiveTab(),
-      selectionMode: selectedPolygonLatLngs ? 'polygon' : (selectedBounds ? 'rect' : null),
-      polygonPts: selectedPolygonLatLngs ? selectedPolygonLatLngs.map(p => [p.lat, p.lng]) : null,
-      boundsArr: selectedBounds ? [[selectedBounds.getSouth(), selectedBounds.getWest()], [selectedBounds.getNorth(), selectedBounds.getEast()]] : null,
-      lastStreets, lastShops, lastStreetSegments, lastDensity,
-      streetSelections: ['st1','st2','st3','st4','stSingle'].map(id => streetPickerSelections[id] || '')
+      streetSelections: ['st1','st2','st3','st4','stSingle'].map(id => streetPickerSelections[id] || ''),
+      lastResult
     };
     localStorage.setItem(STATE_KEY, JSON.stringify(state));
-  } catch (e) { /* تجاهل أخطاء التخزين المحلي (مثل امتلاء المساحة) بأمان دون كسر التطبيق */ }
+  } catch (e) { /* تجاهل */ }
 }
 
 function restoreStreetSelections() {
@@ -1394,11 +901,7 @@ function restoreStreetSelections() {
     ['st1','st2','st3','st4','stSingle'].forEach((id, i) => {
       const el = document.getElementById(id);
       const val = state.streetSelections[i];
-      if (el && val && streetGeometryMap.has(val)) {
-        el.value = val;
-        el.classList.add('valid-pick');
-        streetPickerSelections[id] = val;
-      }
+      if (el && val && streetGeometryMap.has(val)) { el.value = val; el.classList.add('valid-pick'); streetPickerSelections[id] = val; }
     });
   } catch (e) { /* تجاهل */ }
 }
@@ -1407,9 +910,16 @@ function restoreState() {
   let state;
   try {
     const raw = localStorage.getItem(STATE_KEY);
-    if (!raw) return;
-    state = JSON.parse(raw);
-  } catch (e) { return; }
+    if (raw) state = JSON.parse(raw);
+  } catch (e) { /* تجاهل */ }
+
+  // تاريخ البحث يُملأ تلقائياً بتاريخ اليوم افتراضياً، ويمكن تعديله يدوياً
+  const todayIso = new Date().toISOString().slice(0, 10);
+  searchDate = (state && state.searchDate) || todayIso;
+  convoyDate = (state && state.convoyDate) || '';
+  const sdInput = document.getElementById('searchDate'); if (sdInput) sdInput.value = searchDate;
+  const cdInput = document.getElementById('convoyDate'); if (cdInput) cdInput.value = convoyDate;
+
   if (!state) return;
 
   if (state.researcherName) {
@@ -1417,49 +927,28 @@ function restoreState() {
     const input = document.getElementById('researcherName');
     if (input) input.value = researcherName;
   }
-  if (state.paperSize) setPaperSizeSilent(state.paperSize);
-  if (state.activeTab === 'streets' || state.activeTab === 'single') switchTab(state.activeTab);
+  if (state.paperSize) setPaperSize(state.paperSize);
+  if (state.activeTab === 'four') switchTab('four');
 
-  if (state.selectionMode === 'polygon' && state.polygonPts && state.polygonPts.length >= 3) {
-    setSelectionPolygon(state.polygonPts.map(p => L.latLng(p[0], p[1])));
-  } else if (state.selectionMode === 'rect' && state.boundsArr) {
-    setSelection(L.latLngBounds(state.boundsArr[0], state.boundsArr[1]));
+  if (state.districtName) {
+    const sel = document.getElementById('districtSelect');
+    if (sel) {
+      sel.value = state.districtName;
+      currentDistrictName = state.districtName;
+    }
   }
 
-  if (state.lastStreets && state.lastStreets.length) lastStreets = state.lastStreets;
-  if (state.lastDensity) lastDensity = state.lastDensity;
-  if (state.lastShops && state.lastShops.length) {
-    lastShops = state.lastShops;
-    drawAllShopMarkers(lastShops);
+  if (state.lastResult && state.lastResult.items) {
+    lastResult = state.lastResult;
+    if (lastResult.mode === 'single') renderSingleResults(lastResult.extra.streetName, lastResult.items);
+    else renderFourResults(lastResult.extra.boundary, lastResult.items);
   }
-  if (state.lastStreetSegments && state.lastStreetSegments.length) {
-    lastStreetSegments = state.lastStreetSegments;
-    const grouped = new Map();
-    lastStreetSegments.forEach(seg => {
-      drawStreetSegment(seg.coords);
-      if (!grouped.has(seg.name)) grouped.set(seg.name, []);
-      grouped.get(seg.name).push(seg.coords);
-    });
-    addStreetLabels(grouped);
-  }
-  if (lastStreets.length || lastShops.length) {
-    renderResults();
-    document.getElementById('topbar-status').textContent = `${lastStreets.length} شارع • ${lastShops.length} محل ومنشأة (تم الاسترجاع)`;
-  }
-  updateCenterMarker();
-}
-
-function setPaperSizeSilent(size) {
-  paperSize = size;
-  const a3 = document.getElementById('sizeA3'), a4 = document.getElementById('sizeA4');
-  if (a3) a3.classList.toggle('selected', size === 'a3');
-  if (a4) a4.classList.toggle('selected', size === 'a4');
 }
 
 // ===================== بدء التشغيل =====================
 setupStreetPickers();
 restoreState();
-loadDistrictStreetNames(); // تحميل قائمة الشوارع في الخلفية فور فتح الصفحة لتكون جاهزة فوراً عند الحاجة إليها
+if (currentDistrictName) loadDistrictStreetNames();
 </script>
 </body>
 </html>
